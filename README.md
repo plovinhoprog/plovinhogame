@@ -1,2 +1,0 @@
-# plovinhogame
-tg game
