@@ -7,437 +7,578 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  :root {
-    --gold:#f0c040; --gold-dim:#a07820; --gold-glow:rgba(240,192,64,0.35);
-    --bg:#0a0806; --bg2:#110e09; --panel:rgba(26,21,16,0.92);
-    --border:rgba(240,192,64,0.18); --text:#e8d8b0; --text-dim:#8a7855;
-  }
-  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  html,body { height:100%; width:100%; background:var(--bg); color:var(--text);
-    font-family:'EB Garamond',serif; overflow:hidden; user-select:none; }
+:root {
+  --gold:#f0c040; --gold-dim:#a07820; --gold-glow:rgba(240,192,64,0.4);
+  --bg:#08070a; --bg2:#0f0e14; --panel:rgba(22,18,30,0.95);
+  --border:rgba(240,192,64,0.15); --text:#e8d8b0; --text-dim:#7a6e55;
+  --c-common:#9a9a9a; --c-uncommon:#2ecc71; --c-rare:#5dade2;
+  --c-epic:#c39bd3; --c-legendary:#f0c040;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;background:var(--bg);color:var(--text);
+  font-family:'EB Garamond',serif;overflow:hidden;user-select:none}
 
-  #stars { position:fixed; inset:0; z-index:0;
-    background:radial-gradient(ellipse at 20% 50%,rgba(120,80,20,.12) 0%,transparent 60%),
-               radial-gradient(ellipse at 80% 20%,rgba(60,20,10,.15) 0%,transparent 50%),#0a0806; }
-  #stars::before,#stars::after { content:''; position:absolute; inset:0;
-    background-image:
-      radial-gradient(1px 1px at 10% 15%,rgba(255,220,120,.6) 0%,transparent 100%),
-      radial-gradient(1px 1px at 70% 10%,rgba(255,240,180,.7) 0%,transparent 100%),
-      radial-gradient(1.5px 1.5px at 30% 90%,rgba(255,240,180,.6) 0%,transparent 100%),
-      radial-gradient(1px 1px at 85% 60%,rgba(255,210,100,.5) 0%,transparent 100%),
-      radial-gradient(1px 1px at 55% 25%,rgba(255,240,180,.5) 0%,transparent 100%);
-    animation:twinkle 4s ease-in-out infinite alternate; }
-  #stars::after { animation-delay:2s; animation-duration:5s; }
-  @keyframes twinkle { 0%{opacity:.6}100%{opacity:1} }
+/* BG */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-  #app { position:relative; z-index:1; height:100vh; width:100%;
-    display:flex; flex-direction:column; overflow:hidden; }
+#app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
-  header { flex-shrink:0; padding:14px 18px 10px;
-    background:linear-gradient(180deg,rgba(10,8,6,.98) 0%,transparent 100%);
-    display:flex; align-items:center; justify-content:space-between; }
-  .logo { font-family:'Cinzel Decorative',serif; font-size:15px; font-weight:700;
-    color:var(--gold); text-shadow:0 0 20px var(--gold-glow); }
-  .logo span { color:var(--text-dim); font-size:11px; display:block;
-    font-family:'EB Garamond',serif; text-transform:uppercase; margin-top:1px; }
-  .gold-display { display:flex; align-items:center; gap:6px;
-    background:rgba(240,192,64,.08); border:1px solid rgba(240,192,64,.25);
-    border-radius:20px; padding:6px 14px; }
-  .gold-coin { font-size:16px; animation:spin3d 3s linear infinite; }
-  @keyframes spin3d { 0%,45%{transform:rotateY(0)} 50%{transform:rotateY(90deg)} 55%,100%{transform:rotateY(0)} }
-  .gold-amount { font-family:'Cinzel',serif; font-size:15px; font-weight:600;
-    color:var(--gold); text-shadow:0 0 10px var(--gold-glow); min-width:50px;
-    text-align:right; transition:all .4s; }
+/* HEADER */
+header{flex-shrink:0;padding:12px 16px 8px;
+  background:linear-gradient(180deg,rgba(8,7,10,.98) 0%,transparent 100%);
+  display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Cinzel Decorative',serif;font-size:14px;font-weight:700;
+  color:var(--gold);text-shadow:0 0 20px var(--gold-glow);line-height:1.2}
+.logo-sub{font-size:9px;color:var(--text-dim);font-family:'EB Garamond',serif;
+  text-transform:uppercase;letter-spacing:.15em}
+.gold-pill{display:flex;align-items:center;gap:6px;
+  background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.22);
+  border-radius:20px;padding:5px 12px}
+.gold-coin{font-size:15px;animation:coinspin 3s linear infinite}
+@keyframes coinspin{0%,44%{transform:rotateY(0)}50%{transform:rotateY(90deg)}56%,100%{transform:rotateY(0)}}
+#gold-display{font-family:'Cinzel',serif;font-size:14px;font-weight:600;
+  color:var(--gold);text-shadow:0 0 10px var(--gold-glow);min-width:40px;
+  text-align:right;transition:all .35s}
 
-  nav { flex-shrink:0; display:flex; gap:4px; padding:0 14px 10px; }
-  .nav-btn { flex:1; padding:8px 4px; background:transparent; border:1px solid transparent;
-    border-radius:10px; color:var(--text-dim); font-family:'Cinzel',serif; font-size:10px;
-    font-weight:600; letter-spacing:.05em; text-transform:uppercase; cursor:pointer;
-    transition:all .25s; display:flex; flex-direction:column; align-items:center; gap:3px; }
-  .nav-btn .nav-icon { font-size:18px; }
-  .nav-btn.active { background:rgba(240,192,64,.1); border-color:rgba(240,192,64,.35);
-    color:var(--gold); text-shadow:0 0 8px var(--gold-glow); }
-  .nav-btn:active { transform:scale(.95); }
+/* NAV */
+nav{flex-shrink:0;display:flex;gap:3px;padding:0 12px 8px}
+.nav-btn{flex:1;padding:7px 4px;background:transparent;border:1px solid transparent;
+  border-radius:10px;color:var(--text-dim);font-family:'Cinzel',serif;font-size:9px;
+  font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.nav-btn .ni{font-size:17px}
+.nav-btn.active{background:rgba(240,192,64,.09);border-color:rgba(240,192,64,.3);
+  color:var(--gold);text-shadow:0 0 8px var(--gold-glow)}
+.nav-btn:active{transform:scale(.95)}
 
-  #screens { flex:1; overflow:hidden; position:relative; }
-  .screen { position:absolute; inset:0; overflow-y:auto; overflow-x:hidden;
-    padding:0 14px 20px; opacity:0; transform:translateY(16px);
-    pointer-events:none; transition:opacity .3s,transform .3s; }
-  .screen.active { opacity:1; transform:translateY(0); pointer-events:all; }
-  .screen::-webkit-scrollbar { width:3px; }
-  .screen::-webkit-scrollbar-thumb { background:var(--gold-dim); border-radius:3px; }
+/* SCREENS */
+#screens{flex:1;overflow:hidden;position:relative}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:4px 12px 24px;opacity:0;transform:translateY(14px);
+  pointer-events:none;transition:opacity .28s,transform .28s}
+.screen.active{opacity:1;transform:translateY(0);pointer-events:all}
+.screen::-webkit-scrollbar{width:2px}
+.screen::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
 
-  .section-title { font-family:'Cinzel',serif; font-size:11px; font-weight:600;
-    letter-spacing:.2em; text-transform:uppercase; color:var(--text-dim);
-    margin:16px 0 10px; display:flex; align-items:center; gap:10px; }
-  .section-title::after { content:''; flex:1; height:1px;
-    background:linear-gradient(90deg,var(--border),transparent); }
+.sec-title{font-family:'Cinzel',serif;font-size:10px;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);
+  margin:14px 0 9px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--border),transparent)}
 
-  /* Loading */
-  .loading-wrap { display:flex; flex-direction:column; align-items:center;
-    justify-content:center; height:200px; gap:12px; }
-  .spinner { width:36px; height:36px; border:3px solid rgba(240,192,64,.2);
-    border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; }
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .loading-text { font-family:'Cinzel',serif; font-size:12px; color:var(--text-dim);
-    letter-spacing:.2em; text-transform:uppercase; }
+/* ════════════════════════
+   CHEST CARDS — main list
+════════════════════════ */
+.chests-grid{display:flex;flex-direction:column;gap:10px;padding-top:2px}
+.chest-card{position:relative;overflow:hidden;border-radius:16px;
+  background:var(--panel);cursor:pointer;transition:transform .2s,box-shadow .2s;
+  display:flex;align-items:center;gap:0;border:1px solid transparent}
+.chest-card:active{transform:scale(.97)}
 
-  /* Chests */
-  .chest-grid { display:grid; grid-template-columns:1fr; gap:12px; padding-top:4px; }
-  .chest-card { position:relative; overflow:hidden; border:1px solid var(--border);
-    border-radius:16px; background:var(--panel); backdrop-filter:blur(10px);
-    padding:18px 20px; cursor:pointer; transition:all .3s;
-    display:flex; align-items:center; gap:16px; }
-  .chest-card::before { content:''; position:absolute; inset:0;
-    background:linear-gradient(135deg,rgba(240,192,64,.06) 0%,transparent 60%);
-    opacity:0; transition:opacity .3s; }
-  .chest-card:active { transform:scale(.98); }
-  .chest-card:active::before { opacity:1; }
-  .chest-card.wooden { border-color:rgba(139,90,43,.4); }
-  .chest-card.silver { border-color:rgba(180,190,200,.4); }
-  .chest-card.golden { border-color:rgba(240,192,64,.5); box-shadow:0 0 20px rgba(240,192,64,.08); }
-  .chest-card.locked { opacity:.45; pointer-events:none; }
-  .chest-icon-wrap { font-size:44px; flex-shrink:0;
-    filter:drop-shadow(0 0 8px rgba(240,192,64,.3));
-    animation:float 3s ease-in-out infinite; }
-  .chest-card.golden .chest-icon-wrap { filter:drop-shadow(0 0 14px rgba(240,192,64,.6)); }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
-  .chest-info { flex:1; }
-  .chest-name { font-family:'Cinzel',serif; font-size:15px; font-weight:700;
-    color:var(--text); margin-bottom:4px; }
-  .chest-desc { font-size:13px; color:var(--text-dim); font-style:italic; margin-bottom:8px; }
-  .chest-odds { display:flex; gap:5px; flex-wrap:wrap; }
-  .odds-pill { font-size:10px; padding:2px 7px; border-radius:10px;
-    font-family:'Cinzel',serif; font-weight:600; }
-  .odds-pill.common    { background:rgba(150,150,150,.15); color:#aaa; border:1px solid rgba(150,150,150,.3); }
-  .odds-pill.uncommon  { background:rgba(39,174,96,.15); color:#2ecc71; border:1px solid rgba(39,174,96,.3); }
-  .odds-pill.rare      { background:rgba(41,128,185,.15); color:#5dade2; border:1px solid rgba(41,128,185,.3); }
-  .odds-pill.epic      { background:rgba(142,68,173,.15); color:#bb8fce; border:1px solid rgba(142,68,173,.3); }
-  .odds-pill.legendary { background:rgba(243,156,18,.15); color:#f0c040; border:1px solid rgba(243,156,18,.3); }
-  .chest-cost { flex-shrink:0; text-align:center; }
-  .cost-amount { font-family:'Cinzel',serif; font-size:18px; font-weight:700;
-    color:var(--gold); display:block; text-shadow:0 0 10px var(--gold-glow); }
-  .cost-label { font-size:10px; color:var(--text-dim); text-transform:uppercase; }
+/* per-tier colors */
+.chest-card.t1{border-color:rgba(139,90,43,.45);
+  background:linear-gradient(135deg,rgba(22,14,8,.97),rgba(28,18,10,.97))}
+.chest-card.t2{border-color:rgba(192,192,192,.3);
+  background:linear-gradient(135deg,rgba(16,16,22,.97),rgba(22,22,30,.97))}
+.chest-card.t3{border-color:rgba(240,192,64,.35);
+  background:linear-gradient(135deg,rgba(20,16,8,.97),rgba(28,22,8,.97));
+  box-shadow:0 0 18px rgba(240,192,64,.07)}
+.chest-card.t4{border-color:rgba(142,68,173,.45);
+  background:linear-gradient(135deg,rgba(16,10,22,.97),rgba(22,12,30,.97));
+  box-shadow:0 0 18px rgba(142,68,173,.07)}
+.chest-card.t5{border-color:rgba(231,76,60,.5);
+  background:linear-gradient(135deg,rgba(20,8,8,.97),rgba(30,10,10,.97));
+  box-shadow:0 0 22px rgba(231,76,60,.1)}
+.chest-card.t6{border-color:rgba(255,215,0,.6);
+  background:linear-gradient(135deg,rgba(20,16,0,.97),rgba(30,24,4,.97));
+  box-shadow:0 0 28px rgba(255,215,0,.12)}
 
-  /* Open overlay */
-  #open-overlay { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.92);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;
-    opacity:0; pointer-events:none; transition:opacity .3s; }
-  #open-overlay.visible { opacity:1; pointer-events:all; }
-  .opening-chest { font-size:90px; animation:shake .3s ease-in-out infinite;
-    filter:drop-shadow(0 0 30px rgba(240,192,64,.5)); }
-  @keyframes shake { 0%,100%{transform:rotate(-3deg) scale(1)} 50%{transform:rotate(3deg) scale(1.05)} }
-  .opening-text { font-family:'Cinzel',serif; font-size:14px; letter-spacing:.3em;
-    text-transform:uppercase; color:var(--text-dim);
-    animation:pulse-text .8s ease-in-out infinite alternate; }
-  @keyframes pulse-text { from{opacity:.4} to{opacity:1} }
+.chest-art{width:90px;height:90px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:52px;
+  filter:drop-shadow(0 0 10px rgba(240,192,64,.3));
+  animation:float 3s ease-in-out infinite}
+.chest-card.t2 .chest-art{filter:drop-shadow(0 2px 8px rgba(180,180,200,.3));animation-delay:.5s}
+.chest-card.t3 .chest-art{filter:drop-shadow(0 0 16px rgba(240,192,64,.5));animation-delay:1s}
+.chest-card.t4 .chest-art{filter:drop-shadow(0 0 16px rgba(142,68,173,.5));animation-delay:1.5s}
+.chest-card.t5 .chest-art{filter:drop-shadow(0 0 18px rgba(231,76,60,.5));animation-delay:2s}
+.chest-card.t6 .chest-art{filter:drop-shadow(0 0 24px rgba(255,215,0,.7));animation-delay:2.5s}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
 
-  /* Reward overlay */
-  #reward-overlay { position:fixed; inset:0; z-index:101; background:rgba(0,0,0,.88);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
-    opacity:0; pointer-events:none; transition:opacity .4s; }
-  #reward-overlay.visible { opacity:1; pointer-events:all; }
-  .reward-particles { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
-  .particle { position:absolute; border-radius:50%;
-    animation:particle-fly 1.5s ease-out forwards; opacity:0; }
-  @keyframes particle-fly { 0%{transform:translate(0,0) scale(0);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0} }
-  .reward-badge { font-size:11px; padding:4px 16px; border-radius:20px;
-    font-family:'Cinzel',serif; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
-    animation:badge-drop .4s cubic-bezier(.34,1.56,.64,1) .1s both; }
-  .reward-badge.Common    { background:rgba(150,150,150,.2); color:#ccc; border:1px solid rgba(200,200,200,.3); }
-  .reward-badge.Uncommon  { background:rgba(39,174,96,.2); color:#2ecc71; border:1px solid rgba(39,174,96,.4); }
-  .reward-badge.Rare      { background:rgba(41,128,185,.2); color:#5dade2; border:1px solid rgba(41,128,185,.4); }
-  .reward-badge.Epic      { background:rgba(142,68,173,.25); color:#bb8fce; border:1px solid rgba(142,68,173,.5); box-shadow:0 0 20px rgba(142,68,173,.3); }
-  .reward-badge.Legendary { background:rgba(243,156,18,.2); color:#f0c040; border:1px solid rgba(243,156,18,.6); box-shadow:0 0 30px rgba(240,192,64,.4); }
-  @keyframes badge-drop { from{transform:translateY(-20px) scale(.8);opacity:0} to{transform:none;opacity:1} }
-  .reward-item-icon { font-size:72px; animation:item-appear .5s cubic-bezier(.34,1.56,.64,1) .2s both;
-    filter:drop-shadow(0 0 20px rgba(240,192,64,.4)); }
-  @keyframes item-appear { from{transform:scale(0) rotate(-15deg);opacity:0} to{transform:none;opacity:1} }
-  .reward-item-name { font-family:'Cinzel',serif; font-size:22px; font-weight:700;
-    color:var(--text); text-align:center; animation:item-appear .5s cubic-bezier(.34,1.56,.64,1) .3s both; }
-  .reward-item-name.Legendary { color:var(--gold); text-shadow:0 0 20px var(--gold-glow),0 0 40px var(--gold-glow); }
-  .reward-item-name.Epic { color:#bb8fce; text-shadow:0 0 15px rgba(142,68,173,.6); }
-  .reward-value { font-size:15px; color:var(--text-dim); font-style:italic;
-    animation:item-appear .5s ease .4s both; }
-  .reward-value span { color:var(--gold); font-style:normal; font-family:'Cinzel',serif; }
-  .reward-actions { display:flex; gap:10px; margin-top:8px; animation:item-appear .4s ease .55s both; }
-  .btn-primary { padding:12px 24px;
-    background:linear-gradient(135deg,#a07820,#f0c040,#a07820);
-    background-size:200% 100%; background-position:100%;
-    border:none; border-radius:12px; font-family:'Cinzel',serif; font-size:13px;
-    font-weight:700; color:#1a1000; cursor:pointer; transition:all .3s;
-    box-shadow:0 4px 20px rgba(240,192,64,.3); }
-  .btn-primary:active { transform:scale(.96); background-position:0%; }
-  .btn-secondary { padding:12px 20px; background:rgba(255,255,255,.06);
-    border:1px solid var(--border); border-radius:12px; font-family:'Cinzel',serif;
-    font-size:13px; font-weight:600; color:var(--text-dim); cursor:pointer; transition:all .2s; }
-  .btn-secondary:active { transform:scale(.96); }
+.chest-info{flex:1;padding:14px 14px 14px 4px}
+.chest-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.chest-tier-badge{display:inline-block;font-family:'Cinzel',serif;font-size:9px;font-weight:600;
+  padding:2px 8px;border-radius:8px;margin-bottom:6px;letter-spacing:.05em}
+.chest-desc{font-size:12px;color:var(--text-dim);font-style:italic;margin-bottom:8px;line-height:1.4}
+.chest-cost-row{display:flex;align-items:center;gap:6px}
+.chest-cost-num{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold);
+  text-shadow:0 0 10px var(--gold-glow)}
+.chest-cost-lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em}
 
-  /* Inventory */
-  .inv-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:4px; }
-  .stat-card { background:var(--panel); border:1px solid var(--border);
-    border-radius:12px; padding:12px 14px; backdrop-filter:blur(8px); }
-  .stat-label { font-size:10px; color:var(--text-dim); text-transform:uppercase;
-    letter-spacing:.1em; font-family:'Cinzel',serif; margin-bottom:4px; }
-  .stat-value { font-family:'Cinzel',serif; font-size:18px; font-weight:700; color:var(--gold); }
-  .sell-all-btn { width:100%; padding:12px; background:rgba(192,57,43,.12);
-    border:1px solid rgba(192,57,43,.3); border-radius:12px; font-family:'Cinzel',serif;
-    font-size:12px; font-weight:600; color:#e74c3c; letter-spacing:.1em; text-transform:uppercase;
-    cursor:pointer; transition:all .2s; margin-bottom:4px; }
-  .sell-all-btn:active { background:rgba(192,57,43,.25); transform:scale(.98); }
-  .inv-item { display:flex; align-items:center; gap:12px; background:var(--panel);
-    border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:8px;
-    cursor:pointer; transition:all .2s; backdrop-filter:blur(8px); }
-  .inv-item:active { transform:scale(.98); background:rgba(240,192,64,.06); }
-  .inv-item.rarity-Legendary { border-color:rgba(240,192,64,.45); box-shadow:0 0 12px rgba(240,192,64,.08); }
-  .inv-item.rarity-Epic { border-color:rgba(142,68,173,.4); }
-  .inv-item.rarity-Rare { border-color:rgba(41,128,185,.35); }
-  .item-emoji { font-size:28px; flex-shrink:0; }
-  .item-info  { flex:1; min-width:0; }
-  .item-name  { font-family:'Cinzel',serif; font-size:13px; font-weight:600; color:var(--text); }
-  .item-rarity { font-size:11px; margin-top:2px; }
-  .item-rarity.Common { color:#aaa; } .item-rarity.Uncommon { color:#2ecc71; }
-  .item-rarity.Rare { color:#5dade2; } .item-rarity.Epic { color:#bb8fce; }
-  .item-rarity.Legendary { color:var(--gold); }
-  .item-right { text-align:right; flex-shrink:0; }
-  .item-count { font-family:'Cinzel',serif; font-size:12px; color:var(--text-dim); }
-  .item-value { font-family:'Cinzel',serif; font-size:14px; font-weight:600; color:var(--gold); margin-top:2px; }
+.chest-card.locked{opacity:.4;pointer-events:none}
 
-  /* Sell modal */
-  #sell-modal { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.85);
-    display:flex; align-items:flex-end; justify-content:center;
-    opacity:0; pointer-events:none; transition:opacity .3s; }
-  #sell-modal.visible { opacity:1; pointer-events:all; }
-  .sell-sheet { width:100%; max-width:480px; background:var(--bg2);
-    border:1px solid var(--border); border-bottom:none; border-radius:24px 24px 0 0;
-    padding:28px 24px 36px; transform:translateY(100%);
-    transition:transform .35s cubic-bezier(.32,.72,0,1); }
-  #sell-modal.visible .sell-sheet { transform:translateY(0); }
-  .sell-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 20px; }
-  .sell-item-display { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
-  .sell-item-icon { font-size:52px; }
-  .sell-item-name { font-family:'Cinzel',serif; font-size:17px; font-weight:700; color:var(--text); }
-  .sell-item-sub  { font-size:13px; color:var(--text-dim); margin-top:3px; font-style:italic; }
-  .sell-options { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-  .sell-option { padding:14px 10px; border-radius:12px; background:rgba(240,192,64,.06);
-    border:1px solid rgba(240,192,64,.2); text-align:center; cursor:pointer; transition:all .2s; }
-  .sell-option:active { background:rgba(240,192,64,.15); transform:scale(.96); }
-  .sell-option.sell-all-opt { grid-column:1/-1; background:rgba(192,57,43,.1); border-color:rgba(192,57,43,.3); }
-  .sell-opt-count { font-family:'Cinzel',serif; font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
-  .sell-opt-gold  { font-size:12px; color:var(--gold); }
-  .sell-cancel { width:100%; margin-top:12px; padding:12px; background:transparent;
-    border:1px solid var(--border); border-radius:12px; color:var(--text-dim);
-    font-family:'Cinzel',serif; font-size:12px; cursor:pointer; transition:all .2s; }
+/* ════════════════════════
+   CHEST DETAIL SCREEN
+════════════════════════ */
+#chest-detail{position:absolute;inset:0;z-index:50;
+  background:var(--bg);overflow-y:auto;overflow-x:hidden;
+  padding:0 0 30px;
+  opacity:0;transform:translateX(100%);pointer-events:none;
+  transition:opacity .3s,transform .3s}
+#chest-detail.open{opacity:1;transform:translateX(0);pointer-events:all}
 
-  /* Profile */
-  .profile-hero { background:var(--panel); border:1px solid var(--border);
-    border-radius:16px; padding:20px; margin-bottom:12px; text-align:center;
-    backdrop-filter:blur(10px); position:relative; overflow:hidden; }
-  .profile-hero::before { content:''; position:absolute; inset:0;
-    background:radial-gradient(ellipse at 50% 0%,rgba(240,192,64,.08) 0%,transparent 70%); }
-  .profile-avatar { font-size:56px; margin-bottom:8px; filter:drop-shadow(0 0 16px rgba(240,192,64,.4)); }
-  .profile-name { font-family:'Cinzel',serif; font-size:20px; font-weight:700;
-    color:var(--gold); text-shadow:0 0 12px var(--gold-glow); }
-  .profile-sub { font-size:13px; color:var(--text-dim); margin-top:4px; font-style:italic; }
-  .profile-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-  .profile-stat { background:var(--panel); border:1px solid var(--border);
-    border-radius:12px; padding:14px; backdrop-filter:blur(8px); }
-  .ps-icon  { font-size:20px; margin-bottom:6px; }
-  .ps-value { font-family:'Cinzel',serif; font-size:20px; font-weight:700; color:var(--gold); }
-  .ps-label { font-size:11px; color:var(--text-dim); text-transform:uppercase;
-    letter-spacing:.08em; font-family:'Cinzel',serif; margin-top:2px; }
-  .ref-card { background:var(--panel); border:1px solid rgba(240,192,64,.3);
-    border-radius:16px; padding:18px 20px; backdrop-filter:blur(10px);
-    position:relative; overflow:hidden; margin-bottom:12px; }
-  .ref-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background:linear-gradient(90deg,transparent,var(--gold),transparent); opacity:.6; }
-  .ref-title { font-family:'Cinzel',serif; font-size:13px; font-weight:700; color:var(--gold); margin-bottom:6px; }
-  .ref-desc  { font-size:13px; color:var(--text-dim); font-style:italic; margin-bottom:14px; }
-  .ref-reward { display:flex; align-items:center; gap:8px; margin-bottom:14px;
-    padding:10px 14px; background:rgba(240,192,64,.08); border-radius:10px; border:1px solid rgba(240,192,64,.2); }
-  .ref-reward-text { font-family:'Cinzel',serif; font-size:14px; font-weight:600; color:var(--gold); }
-  .ref-reward-sub  { font-size:12px; color:var(--text-dim); }
-  .ref-link-box { background:rgba(0,0,0,.3); border:1px solid var(--border);
-    border-radius:10px; padding:10px 14px; font-size:12px; color:var(--text-dim);
-    font-family:monospace; word-break:break-all; margin-bottom:10px; }
-  .ref-link-label { font-family:'Cinzel',serif; font-size:10px; color:var(--text-dim);
-    text-transform:uppercase; letter-spacing:.1em; margin-bottom:4px; }
-  .ref-share-btn { width:100%; padding:13px; background:linear-gradient(135deg,rgba(240,192,64,.15),rgba(240,192,64,.08));
-    border:1px solid rgba(240,192,64,.35); border-radius:12px; font-family:'Cinzel',serif;
-    font-size:13px; font-weight:700; color:var(--gold); cursor:pointer; transition:all .2s; }
-  .ref-share-btn:active { background:rgba(240,192,64,.2); transform:scale(.98); }
-  .ref-person { display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
-    background:var(--panel); border:1px solid var(--border); border-radius:12px; backdrop-filter:blur(8px); }
-  .ref-person-name { font-family:'Cinzel',serif; font-size:13px; color:var(--text); flex:1; }
-  .ref-person-ts   { font-size:11px; color:var(--text-dim); }
-  .ref-person-gold { font-family:'Cinzel',serif; font-size:13px; font-weight:600; color:var(--gold); }
+.detail-header{display:flex;align-items:center;gap:10px;
+  padding:14px 14px 0;margin-bottom:4px}
+.back-btn{width:36px;height:36px;background:rgba(240,192,64,.08);
+  border:1px solid rgba(240,192,64,.2);border-radius:10px;
+  color:var(--gold);font-size:18px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all .2s}
+.back-btn:active{transform:scale(.92)}
+.detail-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text)}
 
-  /* Toast */
-  #toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
-    z-index:300; background:rgba(20,16,10,.95); border:1px solid var(--border);
-    border-radius:12px; padding:12px 20px; font-family:'Cinzel',serif; font-size:13px;
-    color:var(--text); white-space:nowrap; opacity:0; pointer-events:none; transition:all .3s;
-    box-shadow:0 8px 32px rgba(0,0,0,.5); }
-  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.detail-chest-hero{text-align:center;padding:10px 0 6px}
+.detail-chest-img{font-size:80px;filter:drop-shadow(0 0 20px rgba(240,192,64,.4));
+  animation:float 2.5s ease-in-out infinite;display:inline-block}
+.detail-chest-name{font-family:'Cinzel Decorative',serif;font-size:17px;font-weight:700;
+  color:var(--gold);text-shadow:0 0 16px var(--gold-glow);margin-top:6px}
+.detail-chest-desc{font-size:13px;color:var(--text-dim);font-style:italic;
+  margin:4px 14px 0;text-align:center;line-height:1.5}
 
-  .empty-state { text-align:center; padding:50px 20px; }
-  .empty-icon  { font-size:52px; margin-bottom:14px; opacity:.4; }
-  .empty-text  { font-family:'Cinzel',serif; font-size:14px; color:var(--text-dim); font-weight:600; margin-bottom:6px; }
-  .empty-sub   { font-size:13px; color:var(--text-dim); opacity:.6; font-style:italic; }
+.open-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 0}
+.open-btn{padding:14px 10px;border-radius:14px;font-family:'Cinzel',serif;font-size:13px;
+  font-weight:700;cursor:pointer;transition:all .25s;text-align:center;border:none}
+.open-btn-slow{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.35);
+  color:var(--gold)}
+.open-btn-slow:active{background:rgba(240,192,64,.2)}
+.open-btn-fast{background:linear-gradient(135deg,#8a6010,#f0c040,#8a6010);
+  background-size:200%;background-position:100%;
+  color:#1a1000;box-shadow:0 4px 18px rgba(240,192,64,.3)}
+.open-btn-fast:active{background-position:0%}
+.open-btn .btn-icon{font-size:20px;display:block;margin-bottom:3px}
+.open-btn .btn-cost{font-size:11px;opacity:.75;margin-top:2px}
 
-  /* Error banner */
-  #error-banner { display:none; position:fixed; top:0; left:0; right:0; z-index:500;
-    background:#c0392b; color:#fff; padding:10px 16px; font-family:'Cinzel',serif;
-    font-size:12px; text-align:center; }
+/* drop table */
+.drop-table{padding:0 14px}
+.drop-row{display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:12px;margin-bottom:6px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  transition:background .2s}
+.drop-row:last-child{margin-bottom:0}
+.drop-emoji{font-size:24px;flex-shrink:0;width:32px;text-align:center}
+.drop-info{flex:1;min-width:0}
+.drop-name{font-family:'Cinzel',serif;font-size:12px;font-weight:600}
+.drop-name.Common   {color:var(--c-common)}
+.drop-name.Uncommon {color:var(--c-uncommon)}
+.drop-name.Rare     {color:var(--c-rare)}
+.drop-name.Epic     {color:var(--c-epic)}
+.drop-name.Legendary{color:var(--c-legendary)}
+.drop-val{font-size:11px;color:var(--text-dim);margin-top:1px}
+.drop-chance{font-family:'Cinzel',serif;font-size:12px;font-weight:700;flex-shrink:0}
+.drop-chance.Common   {color:var(--c-common)}
+.drop-chance.Uncommon {color:var(--c-uncommon)}
+.drop-chance.Rare     {color:var(--c-rare)}
+.drop-chance.Epic     {color:var(--c-epic)}
+.drop-chance.Legendary{color:var(--c-legendary)}
+
+/* ════════════════════════
+   SPIN ANIMATION
+════════════════════════ */
+#spin-screen{position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,.97);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s}
+#spin-screen.visible{opacity:1;pointer-events:all}
+
+.spin-chest-anim{font-size:70px;margin-bottom:16px;
+  filter:drop-shadow(0 0 20px rgba(240,192,64,.5));
+  animation:chest-shake .35s ease-in-out infinite}
+@keyframes chest-shake{0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.06)}}
+.spin-chest-anim.fast-mode{animation-duration:.15s}
+
+.spin-status{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;
+  animation:pulse-txt .7s ease-in-out infinite alternate}
+@keyframes pulse-txt{from{opacity:.3}to{opacity:1}}
+
+/* reel */
+.reel-wrap{position:relative;width:calc(100vw - 0px);max-width:480px;height:120px;overflow:hidden}
+.reel-wrap::before,.reel-wrap::after{content:'';position:absolute;top:0;bottom:0;width:70px;z-index:5;pointer-events:none}
+.reel-wrap::before{left:0;background:linear-gradient(90deg,rgba(0,0,0,.97),transparent)}
+.reel-wrap::after{right:0;background:linear-gradient(-90deg,rgba(0,0,0,.97),transparent)}
+.reel-line{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);
+  width:2px;background:var(--gold);z-index:6;
+  box-shadow:0 0 10px var(--gold-glow),0 0 24px var(--gold-glow)}
+.reel-line::before{content:'▼';position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+  color:var(--gold);font-size:12px}
+.reel-line::after{content:'▲';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);
+  color:var(--gold);font-size:12px}
+.reel-track{display:flex;align-items:center;height:120px;gap:5px;padding:0 5px;will-change:transform}
+.reel-item{flex-shrink:0;width:100px;height:108px;border-radius:10px;
+  border:1.5px solid rgba(255,255,255,.07);
+  background:rgba(16,12,8,.95);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.reel-item::after{content:'';display:block;width:80%;height:2px;border-radius:2px;margin-top:2px}
+.reel-item.Common::after   {background:var(--c-common)}
+.reel-item.Uncommon::after {background:var(--c-uncommon)}
+.reel-item.Rare::after     {background:var(--c-rare);box-shadow:0 0 6px var(--c-rare)}
+.reel-item.Epic::after     {background:var(--c-epic);box-shadow:0 0 8px var(--c-epic)}
+.reel-item.Legendary::after{background:var(--c-legendary);box-shadow:0 0 12px var(--c-legendary)}
+.ri-emoji{font-size:34px;line-height:1}
+.ri-name{font-family:'Cinzel',serif;font-size:7.5px;font-weight:600;
+  text-align:center;padding:0 3px;color:var(--text-dim)}
+.ri-rarity{font-size:7px;font-family:'Cinzel',serif;font-weight:700}
+.ri-rarity.Common   {color:var(--c-common)}
+.ri-rarity.Uncommon {color:var(--c-uncommon)}
+.ri-rarity.Rare     {color:var(--c-rare)}
+.ri-rarity.Epic     {color:var(--c-epic)}
+.ri-rarity.Legendary{color:var(--c-legendary)}
+
+.reel-item.is-winner{border-color:var(--gold);
+  box-shadow:0 0 20px rgba(240,192,64,.4);transform:scale(1.05)}
+.reel-item.Legendary.is-winner{animation:leg-winner .5s ease-in-out infinite alternate}
+@keyframes leg-winner{from{box-shadow:0 0 20px rgba(240,192,64,.4)}to{box-shadow:0 0 50px rgba(240,192,64,.9)}}
+
+/* result */
+#spin-result{margin-top:22px;text-align:center;opacity:0;transform:translateY(16px);
+  transition:opacity .4s,transform .4s}
+#spin-result.show{opacity:1;transform:translateY(0)}
+.res-badge{display:inline-block;font-family:'Cinzel',serif;font-size:10px;font-weight:700;
+  padding:3px 14px;border-radius:16px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
+.res-badge.Common   {background:rgba(155,155,155,.15);color:var(--c-common);border:1px solid rgba(155,155,155,.3)}
+.res-badge.Uncommon {background:rgba(46,204,113,.12);color:var(--c-uncommon);border:1px solid rgba(46,204,113,.3)}
+.res-badge.Rare     {background:rgba(93,173,226,.12);color:var(--c-rare);border:1px solid rgba(93,173,226,.35)}
+.res-badge.Epic     {background:rgba(195,155,211,.12);color:var(--c-epic);border:1px solid rgba(195,155,211,.4);box-shadow:0 0 16px rgba(195,155,211,.2)}
+.res-badge.Legendary{background:rgba(240,192,64,.12);color:var(--c-legendary);border:1px solid rgba(240,192,64,.5);box-shadow:0 0 24px rgba(240,192,64,.35)}
+.res-name{font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:3px}
+.res-name.Legendary{color:var(--c-legendary);text-shadow:0 0 20px var(--gold-glow)}
+.res-name.Epic{color:var(--c-epic)}
+.res-val{font-size:13px;color:var(--text-dim);font-style:italic;margin-bottom:14px}
+.res-val span{color:var(--gold);font-style:normal;font-family:'Cinzel',serif}
+.res-actions{display:flex;gap:10px;justify-content:center}
+.btn-keep{padding:11px 22px;background:linear-gradient(135deg,#8a6010,#f0c040,#8a6010);
+  background-size:200%;background-position:100%;
+  border:none;border-radius:12px;font-family:'Cinzel',serif;font-size:13px;
+  font-weight:700;color:#1a1000;cursor:pointer;transition:all .3s;
+  box-shadow:0 4px 18px rgba(240,192,64,.3)}
+.btn-keep:active{background-position:0%}
+.btn-sell-now{padding:11px 18px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:12px;font-family:'Cinzel',serif;
+  font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;transition:all .2s}
+.btn-sell-now:active{transform:scale(.96)}
+
+/* particles */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+.pt{position:absolute;border-radius:50%;animation:ptfly 2s ease-out forwards;opacity:0}
+@keyframes ptfly{0%{transform:translate(0,0) scale(0);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
+
+/* ════════════════════════
+   INVENTORY
+════════════════════════ */
+.inv-top{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.stat-box{background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:10px 12px}
+.stat-box-lbl{font-size:9px;color:var(--text-dim);text-transform:uppercase;
+  letter-spacing:.1em;font-family:'Cinzel',serif;margin-bottom:3px}
+.stat-box-val{font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:var(--gold)}
+.sell-all-btn{width:100%;padding:11px;background:rgba(192,57,43,.1);
+  border:1px solid rgba(192,57,43,.25);border-radius:12px;font-family:'Cinzel',serif;
+  font-size:11px;font-weight:600;color:#e74c3c;letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;margin-bottom:4px}
+.sell-all-btn:active{background:rgba(192,57,43,.2);transform:scale(.98)}
+.inv-item{display:flex;align-items:center;gap:10px;background:var(--panel);
+  border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:7px;
+  cursor:pointer;transition:all .18s}
+.inv-item:active{transform:scale(.98);background:rgba(240,192,64,.05)}
+.inv-item.rarity-Legendary{border-color:rgba(240,192,64,.4);box-shadow:0 0 10px rgba(240,192,64,.07)}
+.inv-item.rarity-Epic{border-color:rgba(195,155,211,.35)}
+.inv-item.rarity-Rare{border-color:rgba(93,173,226,.3)}
+.ii-emoji{font-size:26px;flex-shrink:0}
+.ii-info{flex:1;min-width:0}
+.ii-name{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--text)}
+.ii-rarity{font-size:10px;margin-top:1px}
+.ii-rarity.Common{color:var(--c-common)}.ii-rarity.Uncommon{color:var(--c-uncommon)}
+.ii-rarity.Rare{color:var(--c-rare)}.ii-rarity.Epic{color:var(--c-epic)}.ii-rarity.Legendary{color:var(--c-legendary)}
+.ii-right{text-align:right;flex-shrink:0}
+.ii-count{font-family:'Cinzel',serif;font-size:11px;color:var(--text-dim)}
+.ii-val{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--gold);margin-top:1px}
+
+/* SELL MODAL */
+#sell-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.82);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .28s}
+#sell-modal.visible{opacity:1;pointer-events:all}
+.sell-sheet{width:100%;max-width:480px;background:var(--bg2);
+  border:1px solid var(--border);border-bottom:none;border-radius:22px 22px 0 0;
+  padding:24px 20px 32px;transform:translateY(100%);
+  transition:transform .32s cubic-bezier(.32,.72,0,1)}
+#sell-modal.visible .sell-sheet{transform:translateY(0)}
+.sell-handle{width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.sell-item-hdr{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.sell-item-em{font-size:48px}
+.sell-item-nm{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text)}
+.sell-item-sb{font-size:12px;color:var(--text-dim);margin-top:2px;font-style:italic}
+.sell-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sell-opt{padding:13px 8px;border-radius:12px;background:rgba(240,192,64,.05);
+  border:1px solid rgba(240,192,64,.18);text-align:center;cursor:pointer;transition:all .18s}
+.sell-opt:active{background:rgba(240,192,64,.14);transform:scale(.96)}
+.sell-opt.sell-opt-all{grid-column:1/-1;background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.25)}
+.so-count{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.so-gold{font-size:11px;color:var(--gold)}
+.sell-cancel{width:100%;margin-top:10px;padding:11px;background:transparent;
+  border:1px solid var(--border);border-radius:12px;color:var(--text-dim);
+  font-family:'Cinzel',serif;font-size:11px;cursor:pointer}
+
+/* PROFILE */
+.profile-hero{background:var(--panel);border:1px solid var(--border);
+  border-radius:16px;padding:18px;margin-bottom:10px;text-align:center;
+  position:relative;overflow:hidden}
+.profile-hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(240,192,64,.07) 0%,transparent 70%)}
+.ph-avatar{font-size:50px;margin-bottom:6px;filter:drop-shadow(0 0 14px rgba(240,192,64,.35))}
+.ph-name{font-family:'Cinzel',serif;font-size:18px;font-weight:700;
+  color:var(--gold);text-shadow:0 0 12px var(--gold-glow)}
+.ph-sub{font-size:12px;color:var(--text-dim);margin-top:3px;font-style:italic}
+.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.ps{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px}
+.ps-icon{font-size:18px;margin-bottom:4px}
+.ps-val{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold)}
+.ps-lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;
+  letter-spacing:.06em;font-family:'Cinzel',serif;margin-top:1px}
+.ref-card{background:var(--panel);border:1px solid rgba(240,192,64,.28);
+  border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden}
+.ref-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
+.ref-title{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:5px}
+.ref-desc{font-size:12px;color:var(--text-dim);font-style:italic;margin-bottom:12px}
+.ref-reward-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;
+  padding:9px 12px;background:rgba(240,192,64,.07);border-radius:10px;border:1px solid rgba(240,192,64,.18)}
+.rr-txt{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--gold)}
+.rr-sub{font-size:11px;color:var(--text-dim)}
+.ref-link-lbl{font-family:'Cinzel',serif;font-size:9px;color:var(--text-dim);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+.ref-link-box{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:9px;
+  padding:9px 12px;font-size:11px;color:var(--text-dim);font-family:monospace;
+  word-break:break-all;margin-bottom:9px}
+.ref-share-btn{width:100%;padding:12px;
+  background:linear-gradient(135deg,rgba(240,192,64,.12),rgba(240,192,64,.06));
+  border:1px solid rgba(240,192,64,.3);border-radius:12px;font-family:'Cinzel',serif;
+  font-size:12px;font-weight:700;color:var(--gold);cursor:pointer;transition:all .18s}
+.ref-share-btn:active{background:rgba(240,192,64,.18);transform:scale(.98)}
+.ref-person{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;
+  background:var(--panel);border:1px solid var(--border);border-radius:12px}
+.rp-name{font-family:'Cinzel',serif;font-size:12px;color:var(--text);flex:1}
+.rp-ts{font-size:10px;color:var(--text-dim)}
+.rp-gold{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--gold)}
+
+/* SETTINGS */
+.settings-card{background:var(--panel);border:1px solid var(--border);
+  border-radius:16px;padding:16px;margin-bottom:10px}
+.settings-title{font-family:'Cinzel',serif;font-size:12px;font-weight:700;
+  color:var(--gold);margin-bottom:14px;letter-spacing:.08em;text-transform:uppercase}
+.setting-row{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.setting-row:last-child{border-bottom:none;padding-bottom:0}
+.setting-lbl{font-family:'Cinzel',serif;font-size:13px;color:var(--text)}
+.setting-sub{font-size:11px;color:var(--text-dim);margin-top:2px;font-style:italic}
+.toggle{width:44px;height:24px;background:rgba(255,255,255,.1);border-radius:12px;
+  position:relative;cursor:pointer;transition:background .25s;flex-shrink:0;border:none}
+.toggle.on{background:var(--gold)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;
+  background:#fff;border-radius:50%;transition:transform .25s;
+  box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.toggle.on::after{transform:translateX(20px)}
+.lang-switcher{display:flex;gap:4px}
+.lang-btn{padding:4px 10px;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;
+  font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border);
+  background:transparent;color:var(--text-dim)}
+.lang-btn.active{background:rgba(240,192,64,.15);border-color:rgba(240,192,64,.4);color:var(--gold)}
+
+/* TOAST */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);
+  z-index:400;background:rgba(16,12,8,.97);border:1px solid var(--border);
+  border-radius:12px;padding:10px 18px;font-family:'Cinzel',serif;font-size:12px;
+  color:var(--text);white-space:nowrap;opacity:0;pointer-events:none;transition:all .28s;
+  box-shadow:0 8px 28px rgba(0,0,0,.5)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.empty-state{text-align:center;padding:44px 20px}
+.es-icon{font-size:48px;margin-bottom:12px;opacity:.35}
+.es-txt{font-family:'Cinzel',serif;font-size:13px;color:var(--text-dim);font-weight:600;margin-bottom:4px}
+.es-sub{font-size:12px;color:var(--text-dim);opacity:.5;font-style:italic}
 </style>
 </head>
 <body>
-<div id="stars"></div>
-<div id="error-banner" id="error-banner"></div>
+<canvas id="bg-canvas"></canvas>
+<div class="particles" id="particles"></div>
 
 <div id="app">
   <header>
-    <div class="logo">Treasure Chest<span>Fantasy Loot Game</span></div>
-    <div class="gold-display">
+    <div>
+      <div class="logo" id="logo-txt">Treasure Chest</div>
+      <div class="logo-sub" id="logo-sub">Fantasy Loot Game</div>
+    </div>
+    <div class="gold-pill">
       <span class="gold-coin">🪙</span>
-      <span class="gold-amount" id="gold-display">—</span>
+      <span id="gold-display">—</span>
     </div>
   </header>
+
   <nav>
     <button class="nav-btn active" onclick="showScreen('chests')" id="nav-chests">
-      <span class="nav-icon">📦</span>Chests
+      <span class="ni">🗃️</span><span data-i="nav_chests">Chests</span>
     </button>
     <button class="nav-btn" onclick="showScreen('inventory')" id="nav-inventory">
-      <span class="nav-icon">🎒</span>Bag
+      <span class="ni">🎒</span><span data-i="nav_inv">Bag</span>
     </button>
     <button class="nav-btn" onclick="showScreen('profile')" id="nav-profile">
-      <span class="nav-icon">👤</span>Profile
+      <span class="ni">👤</span><span data-i="nav_prof">Profile</span>
+    </button>
+    <button class="nav-btn" onclick="showScreen('settings')" id="nav-settings">
+      <span class="ni">⚙️</span><span data-i="nav_set">Settings</span>
     </button>
   </nav>
 
-  <div id="screens">
+  <div id="screens" style="position:relative">
+
     <!-- CHESTS -->
     <div class="screen active" id="screen-chests">
-      <div class="section-title">Choose Your Chest</div>
-      <div class="chest-grid">
-        <div class="chest-card wooden" onclick="openChest('wooden')">
-          <div class="chest-icon-wrap">📦</div>
-          <div class="chest-info">
-            <div class="chest-name">Wooden Chest</div>
-            <div class="chest-desc">A basic chest. Cheap, but worth trying!</div>
-            <div class="chest-odds">
-              <span class="odds-pill common">50% Cmn</span>
-              <span class="odds-pill uncommon">30% Unc</span>
-              <span class="odds-pill rare">15% Rare</span>
-              <span class="odds-pill epic">4% Epic</span>
-              <span class="odds-pill legendary">1% Leg</span>
-            </div>
-          </div>
-          <div class="chest-cost"><span class="cost-amount">30</span><span class="cost-label">Gold</span></div>
-        </div>
-        <div class="chest-card silver" onclick="openChest('silver')">
-          <div class="chest-icon-wrap">🥈</div>
-          <div class="chest-info">
-            <div class="chest-name">Silver Chest</div>
-            <div class="chest-desc">Better odds for rarer loot.</div>
-            <div class="chest-odds">
-              <span class="odds-pill common">44% Cmn</span>
-              <span class="odds-pill uncommon">27% Unc</span>
-              <span class="odds-pill rare">19% Rare</span>
-              <span class="odds-pill epic">6% Epic</span>
-              <span class="odds-pill legendary">4% Leg</span>
-            </div>
-          </div>
-          <div class="chest-cost"><span class="cost-amount">100</span><span class="cost-label">Gold</span></div>
-        </div>
-        <div class="chest-card golden" onclick="openChest('golden')">
-          <div class="chest-icon-wrap">🏆</div>
-          <div class="chest-info">
-            <div class="chest-name">Golden Chest</div>
-            <div class="chest-desc">High chance of Epic & Legendary!</div>
-            <div class="chest-odds">
-              <span class="odds-pill common">30% Cmn</span>
-              <span class="odds-pill uncommon">20% Unc</span>
-              <span class="odds-pill rare">28% Rare</span>
-              <span class="odds-pill epic">10% Epic</span>
-              <span class="odds-pill legendary">12% Leg</span>
-            </div>
-          </div>
-          <div class="chest-cost"><span class="cost-amount">300</span><span class="cost-label">Gold</span></div>
-        </div>
-      </div>
+      <div class="sec-title" data-i="choose_chest">Choose Your Chest</div>
+      <div class="chests-grid" id="chests-grid"></div>
     </div>
 
     <!-- INVENTORY -->
     <div class="screen" id="screen-inventory">
-      <div class="inv-stats">
-        <div class="stat-card"><div class="stat-label">Items</div><div class="stat-value" id="inv-count">—</div></div>
-        <div class="stat-card"><div class="stat-label">Total Value</div><div class="stat-value" id="inv-value">—</div></div>
+      <div class="inv-top">
+        <div class="stat-box">
+          <div class="stat-box-lbl" data-i="items">Items</div>
+          <div class="stat-box-val" id="inv-count">—</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-lbl" data-i="total_val">Total Value</div>
+          <div class="stat-box-val" id="inv-value">—</div>
+        </div>
       </div>
-      <button class="sell-all-btn" onclick="sellAll()">🗑️ Sell Everything</button>
-      <div class="section-title">Your Items</div>
-      <div id="inv-list"><div class="loading-wrap"><div class="spinner"></div><div class="loading-text">Loading...</div></div></div>
+      <button class="sell-all-btn" onclick="sellAll()">🗑️ <span data-i="sell_all">Sell Everything</span></button>
+      <div class="sec-title" data-i="your_items">Your Items</div>
+      <div id="inv-list"></div>
     </div>
 
     <!-- PROFILE -->
     <div class="screen" id="screen-profile">
       <div class="profile-hero">
-        <div class="profile-avatar">⚔️</div>
-        <div class="profile-name" id="profile-name">Adventurer</div>
-        <div class="profile-sub">Treasure Hunter</div>
+        <div class="ph-avatar">⚔️</div>
+        <div class="ph-name" id="profile-name">Adventurer</div>
+        <div class="ph-sub" data-i="treasure_hunter">Treasure Hunter</div>
       </div>
       <div class="profile-stats">
-        <div class="profile-stat"><div class="ps-icon">📦</div><div class="ps-value" id="stat-chests">—</div><div class="ps-label">Chests Opened</div></div>
-        <div class="profile-stat"><div class="ps-icon">💸</div><div class="ps-value" id="stat-earned">—</div><div class="ps-label">Total Sold</div></div>
-        <div class="profile-stat"><div class="ps-icon">👥</div><div class="ps-value" id="stat-refs">—</div><div class="ps-label">Referrals</div></div>
-        <div class="profile-stat"><div class="ps-icon">💎</div><div class="ps-value" id="stat-networth">—</div><div class="ps-label">Net Worth</div></div>
+        <div class="ps"><div class="ps-icon">📦</div><div class="ps-val" id="stat-chests">—</div><div class="ps-lbl" data-i="chests_opened">Chests Opened</div></div>
+        <div class="ps"><div class="ps-icon">💸</div><div class="ps-val" id="stat-earned">—</div><div class="ps-lbl" data-i="total_sold">Total Sold</div></div>
+        <div class="ps"><div class="ps-icon">👥</div><div class="ps-val" id="stat-refs">—</div><div class="ps-lbl" data-i="referrals">Referrals</div></div>
+        <div class="ps"><div class="ps-icon">💎</div><div class="ps-val" id="stat-nw">—</div><div class="ps-lbl" data-i="net_worth">Net Worth</div></div>
       </div>
       <div class="ref-card">
-        <div class="ref-title">👥 Referral Program</div>
-        <div class="ref-desc">Invite friends and earn gold for each adventurer who joins!</div>
-        <div class="ref-reward">
-          <div style="font-size:20px">🪙</div>
-          <div><div class="ref-reward-text">+500 Gold per referral</div><div class="ref-reward-sub">Paid instantly when they join</div></div>
+        <div class="ref-title">👥 <span data-i="ref_program">Referral Program</span></div>
+        <div class="ref-desc" data-i="ref_desc">Invite friends and earn gold for each adventurer who joins!</div>
+        <div class="ref-reward-row">
+          <span style="font-size:18px">🪙</span>
+          <div><div class="rr-txt">+500 <span data-i="gold_per_ref">Gold per referral</span></div><div class="rr-sub" data-i="paid_instantly">Paid instantly when they join</div></div>
         </div>
-        <div class="ref-link-label">Your Link</div>
-        <div class="ref-link-box" id="ref-link-display">Loading...</div>
-        <button class="ref-share-btn" onclick="shareReferral()">🔗 Share Referral Link</button>
+        <div class="ref-link-lbl" data-i="your_link">Your Link</div>
+        <div class="ref-link-box" id="ref-link-box">—</div>
+        <button class="ref-share-btn" onclick="shareRef()">🔗 <span data-i="share_link">Share Referral Link</span></button>
       </div>
-      <div class="section-title">Your Referrals</div>
+      <div class="sec-title" data-i="your_refs">Your Referrals</div>
       <div id="ref-list"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="screen" id="screen-settings">
+      <div class="settings-card">
+        <div class="settings-title" data-i="language">🌐 Language / Язык</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-lbl">Interface Language</div>
+            <div class="setting-sub">Язык интерфейса</div>
+          </div>
+          <div class="lang-switcher">
+            <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">RU</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-card">
+        <div class="settings-title" data-i="about">⚔️ About</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-lbl">Treasure Chest</div>
+            <div class="setting-sub" data-i="about_desc">Fantasy loot game</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- CHEST DETAIL -->
+  <div id="chest-detail">
+    <div class="detail-header">
+      <button class="back-btn" onclick="closeDetail()">‹</button>
+      <div class="detail-title" id="detail-title">—</div>
+    </div>
+    <div class="detail-chest-hero">
+      <div class="detail-chest-img" id="detail-chest-img">📦</div>
+      <div class="detail-chest-name" id="detail-chest-name">—</div>
+      <div class="detail-chest-desc" id="detail-chest-desc">—</div>
+    </div>
+    <div class="open-buttons">
+      <button class="open-btn open-btn-slow" onclick="doOpen(false)">
+        <span class="btn-icon">⏳</span>
+        <span data-i="open_slow">Open Slowly</span>
+        <div class="btn-cost" id="btn-cost-slow">— 🪙</div>
+      </button>
+      <button class="open-btn open-btn-fast" onclick="doOpen(true)">
+        <span class="btn-icon">⚡</span>
+        <span data-i="open_fast">Open Fast</span>
+        <div class="btn-cost" id="btn-cost-fast">— 🪙</div>
+      </button>
+    </div>
+    <div class="sec-title" style="margin:14px 14px 8px" data-i="possible_drops">Possible Drops</div>
+    <div class="drop-table" id="drop-table"></div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- SPIN SCREEN -->
+<div id="spin-screen">
+  <div class="spin-chest-anim" id="spin-chest">📦</div>
+  <div class="spin-status" id="spin-status">Opening...</div>
+  <div class="reel-wrap">
+    <div class="reel-line"></div>
+    <div class="reel-track" id="reel-track"></div>
+  </div>
+  <div id="spin-result">
+    <div class="res-badge" id="res-badge">Common</div>
+    <div class="res-name" id="res-name">Item</div>
+    <div class="res-val"><span data-i="worth">Worth</span> <span id="res-val">0</span>🪙</div>
+    <div class="res-actions" style="margin-top:14px">
+      <button class="btn-keep" onclick="keepItem()" data-i="keep_it">Keep It</button>
+      <button class="btn-sell-now" onclick="sellNow()" data-i="sell_now">Sell Now</button>
     </div>
   </div>
 </div>
 
-<!-- Opening -->
-<div id="open-overlay">
-  <div class="opening-chest" id="opening-chest-icon">📦</div>
-  <div class="opening-text">Opening Chest...</div>
-</div>
-
-<!-- Reward -->
-<div id="reward-overlay">
-  <div class="reward-particles" id="reward-particles"></div>
-  <div class="reward-badge" id="reward-badge">Common</div>
-  <div class="reward-item-icon" id="reward-icon">🧪</div>
-  <div class="reward-item-name" id="reward-name">Item</div>
-  <div class="reward-value">Worth <span id="reward-value">0</span>🪙</div>
-  <div class="reward-actions">
-    <button class="btn-primary" onclick="keepItem()">Keep It</button>
-    <button class="btn-secondary" onclick="sellItem()">Sell Now</button>
-  </div>
-</div>
-
-<!-- Sell Modal -->
+<!-- SELL MODAL -->
 <div id="sell-modal" onclick="closeSellModal(event)">
   <div class="sell-sheet">
     <div class="sell-handle"></div>
-    <div class="sell-item-display">
-      <div class="sell-item-icon" id="modal-icon">🧪</div>
-      <div><div class="sell-item-name" id="modal-name">Item</div><div class="sell-item-sub" id="modal-rarity"></div></div>
+    <div class="sell-item-hdr">
+      <div class="sell-item-em" id="modal-em">🧪</div>
+      <div>
+        <div class="sell-item-nm" id="modal-nm">—</div>
+        <div class="sell-item-sb" id="modal-sb">—</div>
+      </div>
     </div>
-    <div class="sell-options" id="sell-options"></div>
-    <button class="sell-cancel" onclick="closeSellModal()">Cancel</button>
+    <div class="sell-opts" id="sell-opts"></div>
+    <button class="sell-cancel" onclick="closeSellModal()" data-i="cancel">Cancel</button>
   </div>
 </div>
 
@@ -445,363 +586,658 @@
 
 <script>
 // ═══════════════════════════════════════════
-//  CONFIG — замени на свой реальный адрес!
+//  CONFIG
 // ═══════════════════════════════════════════
-// Если запускаешь локально: "http://localhost:8000"
-// Если сервер в интернете: "https://твой-домен.com"
-const API_BASE = "https://treasure-chest-bot.onrender.com";
+const API_BASE     = "http://localhost:8000"; // ← замени на Render URL
 const BOT_USERNAME = "plovinhogame_bot";
 
 // ═══════════════════════════════════════════
-//  TELEGRAM INIT
+//  TRANSLATIONS
 // ═══════════════════════════════════════════
-const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
-
-const initData = tg?.initData || "";
-
-// Заголовки для всех API запросов
-function apiHeaders() {
-  const h = { "Content-Type": "application/json" };
-  if (initData) h["X-Telegram-Init-Data"] = initData;
-  // Для локального тестирования без Telegram:
-  else if (tg?.initDataUnsafe?.user?.id)
-    h["X-User-Id"] = String(tg.initDataUnsafe.user.id);
-  return h;
+const T = {
+  en: {
+    nav_chests:"Chests", nav_inv:"Bag", nav_prof:"Profile", nav_set:"Settings",
+    choose_chest:"Choose Your Chest",
+    items:"Items", total_val:"Total Value", sell_all:"Sell Everything",
+    your_items:"Your Items", treasure_hunter:"Treasure Hunter",
+    chests_opened:"Chests Opened", total_sold:"Total Sold",
+    referrals:"Referrals", net_worth:"Net Worth",
+    ref_program:"Referral Program",
+    ref_desc:"Invite friends and earn gold for each adventurer who joins!",
+    gold_per_ref:"Gold per referral", paid_instantly:"Paid instantly when they join",
+    your_link:"Your Link", share_link:"Share Referral Link", your_refs:"Your Referrals",
+    language:"🌐 Language / Язык", about:"⚔️ About", about_desc:"Fantasy loot game",
+    open_slow:"Open Slowly", open_fast:"Open Fast",
+    possible_drops:"Possible Drops",
+    opening:"Opening...", keep_it:"Keep It", sell_now:"Sell Now", worth:"Worth",
+    cancel:"Cancel",
+    not_enough:"❌ Not enough gold!",
+    added_inv:"🎒 Added to inventory!",
+    sold_for:"💰 Sold for",
+    sold_all_for:"💰 Sold everything for",
+    inv_empty:"🎒 Inventory is empty!",
+    items_label:"items", value_label:"value",
+    link_copied:"🔗 Link copied!",
+    no_referrals_title:"No Referrals Yet",
+    no_referrals_sub:"Share your link to earn 500🪙!",
+    no_items_title:"Inventory Empty",
+    no_items_sub:"Open some chests to find loot!",
+  },
+  ru: {
+    nav_chests:"Кейсы", nav_inv:"Сумка", nav_prof:"Профиль", nav_set:"Настройки",
+    choose_chest:"Выбери Кейс",
+    items:"Предметы", total_val:"Общая цена", sell_all:"Продать всё",
+    your_items:"Твои предметы", treasure_hunter:"Охотник за сокровищами",
+    chests_opened:"Открыто кейсов", total_sold:"Продано на",
+    referrals:"Рефералы", net_worth:"Капитал",
+    ref_program:"Реферальная программа",
+    ref_desc:"Приглашай друзей и получай золото за каждого нового игрока!",
+    gold_per_ref:"Золота за реферала", paid_instantly:"Начисляется сразу при входе",
+    your_link:"Твоя ссылка", share_link:"Поделиться ссылкой", your_refs:"Твои рефералы",
+    language:"🌐 Language / Язык", about:"⚔️ О игре", about_desc:"Фэнтезийная лут-игра",
+    open_slow:"Открыть медленно", open_fast:"Открыть быстро",
+    possible_drops:"Возможные предметы",
+    opening:"Открываем...", keep_it:"Оставить", sell_now:"Продать", worth:"Стоимость",
+    cancel:"Отмена",
+    not_enough:"❌ Недостаточно золота!",
+    added_inv:"🎒 Добавлено в инвентарь!",
+    sold_for:"💰 Продано за",
+    sold_all_for:"💰 Продано всё за",
+    inv_empty:"🎒 Инвентарь пуст!",
+    items_label:"предм.", value_label:"цена",
+    link_copied:"🔗 Ссылка скопирована!",
+    no_referrals_title:"Рефералов пока нет",
+    no_referrals_sub:"Поделись ссылкой и зарабатывай 500🪙!",
+    no_items_title:"Инвентарь пуст",
+    no_items_sub:"Открой кейсы чтобы найти лут!",
+  }
+};
+let LANG = localStorage.getItem("lang") || "en";
+function t(key) { return T[LANG][key] || T.en[key] || key; }
+function applyLang() {
+  document.querySelectorAll("[data-i]").forEach(el => {
+    const k = el.getAttribute("data-i");
+    el.textContent = t(k);
+  });
+  document.getElementById("lang-en").classList.toggle("active", LANG==="en");
+  document.getElementById("lang-ru").classList.toggle("active", LANG==="ru");
+  // Re-render dynamic content
+  renderChests();
+  if (document.getElementById("screen-inventory").classList.contains("active")) renderInventory();
+  if (document.getElementById("screen-profile").classList.contains("active"))   renderProfile();
 }
+function setLang(l) {
+  LANG = l;
+  localStorage.setItem("lang", l);
+  applyLang();
+  showToast(l==="ru" ? "🌐 Русский язык включён" : "🌐 English language set");
+}
+
+// ═══════════════════════════════════════════
+//  CHEST DATA
+// ═══════════════════════════════════════════
+const CHESTS = [
+  { key:"wooden",  icon:"🪵", tier:"t1",
+    name:"Wooden Chest",
+    desc_en:"A battered old chest. Cheap thrills for the brave!",
+    desc_ru:"Потрёпанный старый сундук. Дёшево и сердито!",
+    cost:30,
+    badge_en:"⚪ Starter", badge_ru:"⚪ Стартовый",
+    badge_color:"rgba(150,150,150,.2)", badge_text:"#aaa",
+  },
+  { key:"bone",    icon:"🦴", tier:"t2",
+    name:"Bone Chest",
+    desc_en:"Crafted from ancient bones. Uncommon finds await!",
+    desc_ru:"Сделан из древних костей. Жди необычных находок!",
+    cost:60,
+    badge_en:"🟢 Uncommon", badge_ru:"🟢 Необычный",
+    badge_color:"rgba(46,204,113,.15)", badge_text:"#2ecc71",
+  },
+  { key:"silver",  icon:"🥈", tier:"t2",
+    name:"Silver Chest",
+    desc_en:"A polished silver chest. Better odds for rare loot.",
+    desc_ru:"Начищенный серебряный сундук. Больше шансов на редкий лут.",
+    cost:100,
+    badge_en:"🔵 Rare+", badge_ru:"🔵 Редкий+",
+    badge_color:"rgba(93,173,226,.15)", badge_text:"#5dade2",
+  },
+  { key:"shadow",  icon:"🌑", tier:"t4",
+    name:"Shadow Chest",
+    desc_en:"From the void. Epic and Legendary chances boosted!",
+    desc_ru:"Из пустоты. Повышенный шанс на Эпик и Легендарные!",
+    cost:200,
+    badge_en:"🟣 Epic+", badge_ru:"🟣 Эпик+",
+    badge_color:"rgba(142,68,173,.18)", badge_text:"#c39bd3",
+  },
+  { key:"dragon",  icon:"🐉", tier:"t5",
+    name:"Dragon Chest",
+    desc_en:"Forged in dragon fire. Legendary loot is close!",
+    desc_ru:"Выкован в огне дракона. Легендарный лут совсем близко!",
+    cost:500,
+    badge_en:"🔴 Legendary", badge_ru:"🔴 Легендарный",
+    badge_color:"rgba(231,76,60,.18)", badge_text:"#e74c3c",
+  },
+  { key:"golden",  icon:"✨", tier:"t6",
+    name:"Golden Chest",
+    desc_en:"The pinnacle of treasure. Legendary items guaranteed!*",
+    desc_ru:"Вершина сокровищ. Легендарные предметы практически гарантированы!*",
+    cost:1000,
+    badge_en:"🌟 Mythic", badge_ru:"🌟 Мифический",
+    badge_color:"rgba(255,215,0,.2)", badge_text:"#ffd700",
+  },
+];
+
+// Chest odds per tier (rarity weights: Common/Uncommon/Rare/Epic/Legendary)
+const CHEST_ODDS = {
+  wooden: [50,30,15,4,1],
+  bone:   [30,40,22,6,2],
+  silver: [20,30,32,12,6],
+  shadow: [10,20,30,28,12],
+  dragon: [5,10,20,30,35],
+  golden: [0,5,10,25,60],
+};
+
+// ═══════════════════════════════════════════
+//  ITEMS DATA
+// ═══════════════════════════════════════════
+const ITEMS = {
+  health_potion:   {name:"Health Potion",   emoji:"🧪", rarity:"Common",    value:10},
+  wooden_sword:    {name:"Wooden Sword",    emoji:"🗡️",  rarity:"Common",    value:15},
+  leather_boots:   {name:"Leather Boots",   emoji:"👢", rarity:"Common",    value:12},
+  bread_loaf:      {name:"Bread Loaf",      emoji:"🍞", rarity:"Common",    value:5},
+  iron_shield:     {name:"Iron Shield",     emoji:"🛡️",  rarity:"Common",    value:20},
+  mana_potion:     {name:"Mana Potion",     emoji:"💙", rarity:"Uncommon",  value:35},
+  silver_dagger:   {name:"Silver Dagger",   emoji:"🔪", rarity:"Uncommon",  value:50},
+  chain_armor:     {name:"Chain Armor",     emoji:"⛓️",  rarity:"Uncommon",  value:60},
+  magic_scroll:    {name:"Magic Scroll",    emoji:"📜", rarity:"Uncommon",  value:45},
+  enchanted_ring:  {name:"Enchanted Ring",  emoji:"💍", rarity:"Uncommon",  value:55},
+  elven_bow:       {name:"Elven Bow",       emoji:"🏹", rarity:"Rare",      value:150},
+  fire_staff:      {name:"Fire Staff",      emoji:"🔥", rarity:"Rare",      value:180},
+  dragon_scale:    {name:"Dragon Scale",    emoji:"🐉", rarity:"Rare",      value:200},
+  crystal_amulet:  {name:"Crystal Amulet",  emoji:"🔮", rarity:"Rare",      value:160},
+  thunder_axe:     {name:"Thunder Axe",     emoji:"⚡", rarity:"Epic",      value:500},
+  void_cloak:      {name:"Void Cloak",      emoji:"🌑", rarity:"Epic",      value:550},
+  phoenix_feather: {name:"Phoenix Feather", emoji:"🦅", rarity:"Epic",      value:480},
+  excalibur:       {name:"Excalibur",       emoji:"⚔️",  rarity:"Legendary", value:2000},
+  crown_of_gods:   {name:"Crown of Gods",   emoji:"👑", rarity:"Legendary", value:2500},
+  chaos_orb:       {name:"Chaos Orb",       emoji:"🌀", rarity:"Legendary", value:1800},
+};
+const ITEM_KEYS    = Object.keys(ITEMS);
+const RARITY_ORDER = ["Common","Uncommon","Rare","Epic","Legendary"];
 
 // ═══════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════
-let state = { gold:0, inventory:{}, chests_opened:0, total_earned:0,
-              referrals:[], first_name:"Adventurer", username:null };
-let pendingItem = null;
-let modalItem   = null;
+let state = {gold:0,inventory:{},chests_opened:0,total_earned:0,referrals:[],first_name:"Adventurer"};
+let pendingItem  = null;
+let modalItem    = null;
+let isSpinning   = false;
+let currentChest = null;
 
 // ═══════════════════════════════════════════
-//  API CALLS
+//  TELEGRAM
 // ═══════════════════════════════════════════
-async function apiFetch(path, options={}) {
-  try {
-    const res = await fetch(API_BASE + path, {
-      headers: apiHeaders(),
-      ...options,
+const tg = window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+const initData = tg?.initData||"";
+function apiHeaders(){
+  const h={"Content-Type":"application/json"};
+  if(initData) h["X-Telegram-Init-Data"]=initData;
+  else if(tg?.initDataUnsafe?.user?.id) h["X-User-Id"]=String(tg.initDataUnsafe.user.id);
+  return h;
+}
+
+// ═══════════════════════════════════════════
+//  API
+// ═══════════════════════════════════════════
+async function apiFetch(path, opts={}){
+  try{
+    const r=await fetch(API_BASE+path,{headers:apiHeaders(),...opts});
+    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||"Error");}
+    return await r.json();
+  }catch(e){ showToast("❌ "+e.message); throw e; }
+}
+async function loadPlayer(){
+  const d=await apiFetch("/api/player");
+  state={...state,...d}; updateGold();
+}
+
+// ═══════════════════════════════════════════
+//  BACKGROUND CANVAS
+// ═══════════════════════════════════════════
+(function(){
+  const c=document.getElementById("bg-canvas");
+  const ctx=c.getContext("2d");
+  const stars=[];
+  function resize(){ c.width=innerWidth; c.height=innerHeight; }
+  resize(); window.addEventListener("resize",resize);
+  for(let i=0;i<120;i++) stars.push({
+    x:Math.random(),y:Math.random(),
+    r:Math.random()*1.2+.3,
+    a:Math.random(),da:(Math.random()-.5)*.008,
+  });
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      s.a=Math.max(.1,Math.min(1,s.a+s.da));
+      if(s.a<=.1||s.a>=1) s.da*=-1;
+      ctx.globalAlpha=s.a*.7;
+      ctx.fillStyle="#f0d878";
+      ctx.beginPath();
+      ctx.arc(s.x*c.width,s.y*c.height,s.r,0,Math.PI*2);
+      ctx.fill();
     });
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({detail:"Server error"}));
-      throw new Error(err.detail || "Error");
-    }
-    return await res.json();
-  } catch(e) {
-    if (e.message === "Failed to fetch") {
-      showError("Cannot connect to server. Is bot.py running?");
-    } else {
-      showToast("❌ " + e.message);
-    }
-    throw e;
+    ctx.globalAlpha=1;
+    requestAnimationFrame(draw);
   }
-}
-
-async function loadPlayer() {
-  const data = await apiFetch("/api/player");
-  state = { ...state, ...data };
-  updateGoldDisplay();
-}
-
-async function doOpenChest(chestType) {
-  const data = await apiFetch("/api/open_chest", {
-    method: "POST",
-    body: JSON.stringify({ chest_type: chestType }),
-  });
-  state.gold = data.gold;
-  // Update inventory count locally
-  const key = data.item_key;
-  state.inventory[key] = (state.inventory[key] || 0) + 1;
-  return data;
-}
-
-async function doSell(itemKey, qty) {
-  const data = await apiFetch("/api/sell", {
-    method: "POST",
-    body: JSON.stringify({ item_key: itemKey, quantity: qty }),
-  });
-  state.gold = data.gold;
-  state.inventory[itemKey] = (state.inventory[itemKey] || 0) - data.sold;
-  if (state.inventory[itemKey] <= 0) delete state.inventory[itemKey];
-  return data;
-}
-
-async function doSellAll() {
-  const data = await apiFetch("/api/sell_all", { method: "POST" });
-  state.gold = data.gold;
-  state.inventory = {};
-  return data;
-}
+  draw();
+})();
 
 // ═══════════════════════════════════════════
-//  UI
+//  CHEST LIST RENDER
 // ═══════════════════════════════════════════
-function updateGoldDisplay() {
-  const el = document.getElementById("gold-display");
-  el.style.transform = "scale(1.2)";
-  el.style.color = "#fff";
-  el.textContent = state.gold;
-  setTimeout(() => { el.style.transform=""; el.style.color=""; }, 300);
-}
-
-function showScreen(name) {
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
-  document.getElementById("screen-"+name).classList.add("active");
-  document.getElementById("nav-"+name).classList.add("active");
-  if (name==="inventory") renderInventory();
-  if (name==="profile")   renderProfile();
-}
-
-const RARITY_ORDER = ["Common","Uncommon","Rare","Epic","Legendary"];
-
-function renderInventory() {
-  const items = Object.entries(state.inventory).filter(([,v])=>v>0);
-  const count = items.reduce((a,[,v])=>a+v,0);
-  // We need item data — fetch from API on first load, then cache
-  document.getElementById("inv-count").textContent = count;
-
-  if (!window._items) {
-    apiFetch("/api/items").then(d => { window._items=d; renderInventory(); });
-    return;
-  }
-  const ITEMS = window._items;
-  const value = items.reduce((a,[k,v])=>a+(ITEMS[k]?.value||0)*v,0);
-  document.getElementById("inv-value").textContent = value+"🪙";
-
-  const sorted = [...items].sort((a,b)=>
-    RARITY_ORDER.indexOf(ITEMS[b[0]]?.rarity) - RARITY_ORDER.indexOf(ITEMS[a[0]]?.rarity)
-  );
-  const list = document.getElementById("inv-list");
-  if (!sorted.length) {
-    list.innerHTML=`<div class="empty-state"><div class="empty-icon">🎒</div>
-      <div class="empty-text">Inventory Empty</div>
-      <div class="empty-sub">Open some chests to find loot!</div></div>`;
-    return;
-  }
-  list.innerHTML = sorted.map(([key,cnt]) => {
-    const item = ITEMS[key] || {};
-    return `<div class="inv-item rarity-${item.rarity}" onclick="openSellModal('${key}')">
-      <div class="item-emoji">${item.emoji||"📦"}</div>
-      <div class="item-info">
-        <div class="item-name">${item.name||key}</div>
-        <div class="item-rarity ${item.rarity}">⬥ ${item.rarity}</div>
-      </div>
-      <div class="item-right">
-        <div class="item-count">×${cnt}</div>
-        <div class="item-value">${(item.value||0)*cnt}🪙</div>
+function renderChests(){
+  const grid=document.getElementById("chests-grid");
+  grid.innerHTML=CHESTS.map(ch=>{
+    const badge = LANG==="ru" ? ch.badge_ru : ch.badge_en;
+    const desc  = LANG==="ru" ? ch.desc_ru  : ch.desc_en;
+    const canOpen = state.gold >= ch.cost;
+    return `<div class="chest-card ${ch.tier}${canOpen?"":" locked"}" onclick="openDetail('${ch.key}')">
+      <div class="chest-art">${ch.icon}</div>
+      <div class="chest-info">
+        <div class="chest-name">${ch.name}</div>
+        <div class="chest-tier-badge" style="background:${ch.badge_color};color:${ch.badge_text};border:1px solid ${ch.badge_text}44">${badge}</div>
+        <div class="chest-desc">${desc}</div>
+        <div class="chest-cost-row">
+          <span class="chest-cost-num">${ch.cost}</span>
+          <span class="chest-cost-lbl">🪙 gold</span>
+        </div>
       </div>
     </div>`;
   }).join("");
 }
 
-function renderProfile() {
-  document.getElementById("profile-name").textContent = state.first_name || "Adventurer";
-  document.getElementById("stat-chests").textContent  = state.chests_opened;
-  document.getElementById("stat-earned").textContent  = state.total_earned+"🪙";
-  document.getElementById("stat-refs").textContent    = state.referrals.length;
+// ═══════════════════════════════════════════
+//  CHEST DETAIL
+// ═══════════════════════════════════════════
+function openDetail(chestKey){
+  currentChest = CHESTS.find(c=>c.key===chestKey);
+  if(!currentChest) return;
 
-  const ITEMS = window._items || {};
-  const invVal = Object.entries(state.inventory)
-    .reduce((a,[k,v])=>a+(ITEMS[k]?.value||0)*v, 0);
-  document.getElementById("stat-networth").textContent = (state.gold+invVal)+"🪙";
+  document.getElementById("detail-title").textContent = currentChest.name;
+  document.getElementById("detail-chest-img").textContent = currentChest.icon;
+  document.getElementById("detail-chest-name").textContent = currentChest.name;
+  document.getElementById("detail-chest-desc").textContent =
+    LANG==="ru" ? currentChest.desc_ru : currentChest.desc_en;
+  document.getElementById("btn-cost-slow").textContent = `${currentChest.cost} 🪙`;
+  document.getElementById("btn-cost-fast").textContent = `${currentChest.cost} 🪙`;
 
-  const uid = tg?.initDataUnsafe?.user?.id || "demo";
-  const link = `https://t.me/${BOT_USERNAME}?start=ref_${uid}`;
-  document.getElementById("ref-link-display").textContent = link;
+  // Build drop table
+  const odds = CHEST_ODDS[chestKey];
+  const totalWeight = odds.reduce((a,b)=>a+b,0);
+  const dropEl = document.getElementById("drop-table");
 
-  const refList = document.getElementById("ref-list");
-  if (!state.referrals.length) {
-    refList.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div>
-      <div class="empty-text">No Referrals Yet</div>
-      <div class="empty-sub">Share your link to earn 500🪙 per friend!</div></div>`;
+  // Group items by rarity
+  const byRarity = {};
+  ITEM_KEYS.forEach(k=>{ const r=ITEMS[k].rarity; if(!byRarity[r]) byRarity[r]=[]; byRarity[r].push(k); });
+
+  let html="";
+  RARITY_ORDER.forEach((rarity,ri)=>{
+    if(!byRarity[rarity]||odds[ri]===0) return;
+    const rarityChance = odds[ri];
+    const itemsInRarity = byRarity[rarity].length;
+    byRarity[rarity].forEach(key=>{
+      const item = ITEMS[key];
+      const chance = (rarityChance / itemsInRarity / totalWeight * 100).toFixed(1);
+      html+=`<div class="drop-row">
+        <div class="drop-emoji">${item.emoji}</div>
+        <div class="drop-info">
+          <div class="drop-name ${rarity}">${item.name}</div>
+          <div class="drop-val">${item.value}🪙 · ${rarity}</div>
+        </div>
+        <div class="drop-chance ${rarity}">${chance}%</div>
+      </div>`;
+    });
+  });
+  dropEl.innerHTML = html;
+
+  document.getElementById("chest-detail").classList.add("open");
+  if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+}
+
+function closeDetail(){
+  document.getElementById("chest-detail").classList.remove("open");
+  currentChest=null;
+}
+
+// ═══════════════════════════════════════════
+//  OPEN CHEST
+// ═══════════════════════════════════════════
+async function doOpen(fast){
+  if(!currentChest||isSpinning) return;
+  if(state.gold<currentChest.cost){ showToast(t("not_enough")); return; }
+
+  isSpinning=true;
+  closeDetail();
+
+  // Show spin screen
+  const ss=document.getElementById("spin-screen");
+  document.getElementById("spin-result").classList.remove("show");
+  document.getElementById("spin-chest").textContent=currentChest.icon;
+  document.getElementById("spin-chest").className="spin-chest-anim"+(fast?" fast-mode":"");
+  document.getElementById("spin-status").textContent=t("opening");
+  ss.classList.add("visible");
+
+  try{
+    const result=await apiFetch("/api/open_chest",{
+      method:"POST",
+      body:JSON.stringify({chest_type:currentChest.key}),
+    });
+    state.gold=result.gold;
+    state.inventory[result.item_key]=(state.inventory[result.item_key]||0)+1;
+    pendingItem=result.item_key;
+    updateGold();
+
+    // Run spin animation
+    const duration = fast ? 1800 : 4500;
+    await runSpin(result.item_key, duration);
+
+  }catch(e){
+    ss.classList.remove("visible");
+    isSpinning=false;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  SPIN ANIMATION
+// ═══════════════════════════════════════════
+const ITEM_W = 105; // item width + gap
+
+function buildReel(winnerKey){
+  const track=document.getElementById("reel-track");
+  track.innerHTML="";
+  const total=60, winPos=45;
+  const arr=[];
+  for(let i=0;i<total;i++) arr.push(i===winPos ? winnerKey : randomReelItem());
+  arr.forEach((key,i)=>{
+    const item=ITEMS[key];
+    const el=document.createElement("div");
+    el.className=`reel-item ${item.rarity}`;
+    if(i===winPos) el.id="reel-winner";
+    el.innerHTML=`<div class="ri-emoji">${item.emoji}</div>
+      <div class="ri-name">${item.name}</div>
+      <div class="ri-rarity ${item.rarity}">${item.rarity}</div>`;
+    track.appendChild(el);
+  });
+  return winPos;
+}
+
+function randomReelItem(){
+  // Weighted pool biased towards commons for visual variety
+  const w={Common:50,Uncommon:30,Rare:15,Epic:4,Legendary:1};
+  const pool=[];
+  ITEM_KEYS.forEach(k=>{ for(let i=0;i<(w[ITEMS[k].rarity]||1);i++) pool.push(k); });
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function runSpin(winnerKey, duration){
+  return new Promise(resolve=>{
+    const track=document.getElementById("reel-track");
+    track.style.transition="none";
+    track.style.transform="translateX(200px)";
+
+    const ww=document.querySelector(".reel-wrap").offsetWidth;
+    const center=ww/2;
+    const winPos=buildReel(winnerKey);
+    const targetX=-(winPos*ITEM_W)+center-ITEM_W/2;
+    const jitter=(Math.random()-.5)*20;
+    const finalX=targetX+jitter;
+    const startX=200;
+    const start=performance.now();
+
+    // Easing: quartic out
+    function ease(t){ return 1-Math.pow(1-t,4); }
+
+    let hapticDone=false;
+    function step(now){
+      const elapsed=now-start;
+      const pct=Math.min(elapsed/duration,1);
+      const ex=ease(pct);
+      track.style.transform=`translateX(${startX+(finalX-startX)*ex}px)`;
+
+      // Haptic feedback when slowing down
+      if(pct>0.72&&!hapticDone){
+        hapticDone=true;
+        if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
+      }
+
+      if(pct<1){ requestAnimationFrame(step); }
+      else{
+        // Snap to exact center
+        track.style.transform=`translateX(${targetX}px)`;
+        const winner=document.getElementById("reel-winner");
+        if(winner) winner.classList.add("is-winner");
+        setTimeout(()=>{ showSpinResult(ITEMS[winnerKey]); resolve(); }, 350);
+      }
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+function showSpinResult(item){
+  if(tg?.HapticFeedback){
+    const hap={Common:"light",Uncommon:"medium",Rare:"medium",Epic:"heavy",Legendary:"heavy"};
+    tg.HapticFeedback.impactOccurred(hap[item.rarity]||"light");
+    if(item.rarity==="Legendary") setTimeout(()=>tg.HapticFeedback.notificationOccurred("success"),200);
+  }
+  if(["Epic","Legendary"].includes(item.rarity)) spawnParticles(item.rarity);
+
+  document.getElementById("res-badge").textContent = item.rarity;
+  document.getElementById("res-badge").className   = "res-badge "+item.rarity;
+  document.getElementById("res-name").textContent  = item.name;
+  document.getElementById("res-name").className    = "res-name "+item.rarity;
+  document.getElementById("res-val").textContent   = item.value;
+
+  // Update worth label
+  const worthEl = document.querySelector("#spin-result .res-val [data-i='worth']");
+  if(worthEl) worthEl.textContent=t("worth");
+  document.querySelector(".btn-keep").textContent=t("keep_it");
+  document.querySelector(".btn-sell-now").textContent=t("sell_now");
+
+  document.getElementById("spin-result").classList.add("show");
+  document.getElementById("spin-status").style.display="none";
+}
+
+function keepItem(){
+  document.getElementById("spin-screen").classList.remove("visible");
+  document.getElementById("spin-status").style.display="";
+  document.getElementById("particles").innerHTML="";
+  pendingItem=null; isSpinning=false;
+  showToast(t("added_inv"));
+}
+
+async function sellNow(){
+  if(!pendingItem) return;
+  try{
+    const d=await apiFetch("/api/sell",{method:"POST",body:JSON.stringify({item_key:pendingItem,quantity:1})});
+    state.gold=d.gold;
+    state.inventory[pendingItem]=(state.inventory[pendingItem]||1)-1;
+    if(state.inventory[pendingItem]<=0) delete state.inventory[pendingItem];
+    updateGold();
+    showToast(`${t("sold_for")} ${d.earnings}🪙!`);
+  }catch(e){}
+  document.getElementById("spin-screen").classList.remove("visible");
+  document.getElementById("spin-status").style.display="";
+  document.getElementById("particles").innerHTML="";
+  pendingItem=null; isSpinning=false;
+}
+
+function spawnParticles(rarity){
+  const pc=document.getElementById("particles");
+  pc.innerHTML="";
+  const col={Epic:"#c39bd3",Legendary:"#f0c040"}[rarity];
+  const n=rarity==="Legendary"?55:25;
+  for(let i=0;i<n;i++){
+    const p=document.createElement("div");
+    p.className="pt";
+    const sz=Math.random()*9+4;
+    p.style.cssText=`width:${sz}px;height:${sz}px;background:${col};
+      left:${20+Math.random()*60}%;top:${25+Math.random()*35}%;
+      --tx:${(Math.random()-.5)*420}px;--ty:${(Math.random()-.5)*520}px;
+      animation-delay:${Math.random()*.45}s;animation-duration:${Math.random()*1.2+1}s`;
+    pc.appendChild(p);
+  }
+  setTimeout(()=>pc.innerHTML="",2800);
+}
+
+// ═══════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════
+function updateGold(){
+  const el=document.getElementById("gold-display");
+  el.style.transform="scale(1.18)"; el.style.color="#fff";
+  el.textContent=state.gold;
+  setTimeout(()=>{el.style.transform="";el.style.color=""},320);
+  renderChests(); // update locked state
+}
+
+function showScreen(name){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("screen-"+name).classList.add("active");
+  document.getElementById("nav-"+name).classList.add("active");
+  if(name==="inventory") renderInventory();
+  if(name==="profile")   renderProfile();
+}
+
+function renderInventory(){
+  const items=Object.entries(state.inventory).filter(([,v])=>v>0);
+  const count=items.reduce((a,[,v])=>a+v,0);
+  const value=items.reduce((a,[k,v])=>a+(ITEMS[k]?.value||0)*v,0);
+  document.getElementById("inv-count").textContent=count;
+  document.getElementById("inv-value").textContent=value+"🪙";
+  const sorted=[...items].sort((a,b)=>RARITY_ORDER.indexOf(ITEMS[b[0]]?.rarity)-RARITY_ORDER.indexOf(ITEMS[a[0]]?.rarity));
+  const list=document.getElementById("inv-list");
+  if(!sorted.length){
+    list.innerHTML=`<div class="empty-state"><div class="es-icon">🎒</div>
+      <div class="es-txt">${t("no_items_title")}</div>
+      <div class="es-sub">${t("no_items_sub")}</div></div>`;
+    return;
+  }
+  list.innerHTML=sorted.map(([key,cnt])=>{
+    const item=ITEMS[key]||{};
+    return `<div class="inv-item rarity-${item.rarity}" onclick="openSellModal('${key}')">
+      <div class="ii-emoji">${item.emoji||"📦"}</div>
+      <div class="ii-info">
+        <div class="ii-name">${item.name||key}</div>
+        <div class="ii-rarity ${item.rarity}">⬥ ${item.rarity}</div>
+      </div>
+      <div class="ii-right">
+        <div class="ii-count">×${cnt}</div>
+        <div class="ii-val">${(item.value||0)*cnt}🪙</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderProfile(){
+  document.getElementById("profile-name").textContent=state.first_name||"Adventurer";
+  document.getElementById("stat-chests").textContent=state.chests_opened;
+  document.getElementById("stat-earned").textContent=state.total_earned+"🪙";
+  document.getElementById("stat-refs").textContent=state.referrals.length;
+  const invVal=Object.entries(state.inventory).reduce((a,[k,v])=>a+(ITEMS[k]?.value||0)*v,0);
+  document.getElementById("stat-nw").textContent=(state.gold+invVal)+"🪙";
+  const uid=tg?.initDataUnsafe?.user?.id||"demo";
+  document.getElementById("ref-link-box").textContent=`https://t.me/${BOT_USERNAME}?start=ref_${uid}`;
+  const rl=document.getElementById("ref-list");
+  if(!state.referrals.length){
+    rl.innerHTML=`<div class="empty-state"><div class="es-icon">👥</div>
+      <div class="es-txt">${t("no_referrals_title")}</div>
+      <div class="es-sub">${t("no_referrals_sub")}</div></div>`;
   } else {
-    refList.innerHTML = state.referrals.map(r=>`
+    rl.innerHTML=state.referrals.map(r=>`
       <div class="ref-person">
-        <div style="font-size:24px">👤</div>
-        <div class="ref-person-name">${r.name}</div>
-        <div class="ref-person-ts">${r.ts}</div>
-        <div class="ref-person-gold">+500🪙</div>
+        <span style="font-size:22px">👤</span>
+        <span class="rp-name">${r.name}</span>
+        <span class="rp-ts">${r.ts}</span>
+        <span class="rp-gold">+500🪙</span>
       </div>`).join("");
   }
 }
 
-// ═══════════════════════════════════════════
-//  CHEST OPENING
-// ═══════════════════════════════════════════
-async function openChest(chestKey) {
-  const costs = {wooden:30, silver:100, golden:300};
-  if (state.gold < costs[chestKey]) { showToast("❌ Not enough gold!"); return; }
-
-  document.querySelectorAll(".chest-card").forEach(c=>c.classList.add("locked"));
-  const icons = {wooden:"📦", silver:"🥈", golden:"🏆"};
-  document.getElementById("opening-chest-icon").textContent = icons[chestKey];
-  document.getElementById("open-overlay").classList.add("visible");
-
-  try {
-    // Small delay for animation
-    await new Promise(r=>setTimeout(r,1400));
-    const result = await doOpenChest(chestKey);
-    document.getElementById("open-overlay").classList.remove("visible");
-    updateGoldDisplay();
-    pendingItem = result.item_key;
-    showReward(result.item);
-  } catch(e) {
-    document.getElementById("open-overlay").classList.remove("visible");
-  } finally {
-    document.querySelectorAll(".chest-card").forEach(c=>c.classList.remove("locked"));
-  }
-}
-
-function showReward(item) {
-  document.getElementById("reward-badge").textContent = item.rarity;
-  document.getElementById("reward-badge").className   = "reward-badge "+item.rarity;
-  document.getElementById("reward-icon").textContent  = item.emoji;
-  document.getElementById("reward-name").textContent  = item.name;
-  document.getElementById("reward-name").className    = "reward-item-name "+item.rarity;
-  document.getElementById("reward-value").textContent = item.value;
-
-  // Particles
-  const pc = document.getElementById("reward-particles");
-  pc.innerHTML="";
-  const colors = {Common:"#aaa",Uncommon:"#2ecc71",Rare:"#5dade2",Epic:"#bb8fce",Legendary:"#f0c040"};
-  const count  = {Common:10,Uncommon:15,Rare:20,Epic:28,Legendary:45}[item.rarity]||12;
-  for (let i=0;i<count;i++) {
-    const p=document.createElement("div");
-    p.className="particle";
-    const sz=Math.random()*6+4;
-    p.style.cssText=`width:${sz}px;height:${sz}px;background:${colors[item.rarity]};
-      left:50%;top:50%;--tx:${(Math.random()-.5)*300}px;--ty:${(Math.random()-.5)*400}px;
-      animation-delay:${Math.random()*.3}s;animation-duration:${Math.random()*.8+.8}s`;
-    pc.appendChild(p);
-  }
-  document.getElementById("reward-overlay").classList.add("visible");
-  if (tg?.HapticFeedback) {
-    const t={Common:"light",Uncommon:"medium",Rare:"medium",Epic:"heavy",Legendary:"heavy"}[item.rarity];
-    tg.HapticFeedback.impactOccurred(t||"light");
-    if (item.rarity==="Legendary") setTimeout(()=>tg.HapticFeedback.notificationOccurred("success"),300);
-  }
-}
-
-function keepItem() {
-  document.getElementById("reward-overlay").classList.remove("visible");
-  pendingItem=null;
-  showToast("🎒 Added to inventory!");
-}
-
-async function sellItem() {
-  if (!pendingItem) return;
-  try {
-    const data = await doSell(pendingItem, 1);
-    updateGoldDisplay();
-    document.getElementById("reward-overlay").classList.remove("visible");
-    showToast(`💰 Sold for ${data.earnings}🪙!`);
-  } catch(e) {}
-  pendingItem=null;
-}
-
-// ═══════════════════════════════════════════
-//  SELL MODAL
-// ═══════════════════════════════════════════
-function openSellModal(itemKey) {
-  if (!window._items) return;
-  modalItem = itemKey;
-  const item  = window._items[itemKey];
-  const count = state.inventory[itemKey] || 0;
-  document.getElementById("modal-icon").textContent    = item.emoji;
-  document.getElementById("modal-name").textContent    = item.name;
-  document.getElementById("modal-rarity").textContent  = `${item.rarity} · ${item.value}🪙 each`;
-
+// SELL MODAL
+function openSellModal(key){
+  modalItem=key;
+  const item=ITEMS[key]; const count=state.inventory[key]||0;
+  document.getElementById("modal-em").textContent=item.emoji;
+  document.getElementById("modal-nm").textContent=item.name;
+  document.getElementById("modal-sb").textContent=`${item.rarity} · ${item.value}🪙 each`;
   let html="";
-  const addOpt=(label,qty,gold,cls="")=>
-    html+=`<div class="sell-option ${cls}" onclick="executeSell(${qty})">
-      <div class="sell-opt-count">${label}</div><div class="sell-opt-gold">${gold}🪙</div></div>`;
-
-  addOpt("Sell ×1",1,item.value);
-  if(count>=5)  addOpt("Sell ×5",5,item.value*5);
-  if(count>=10) addOpt("Sell ×10",10,item.value*10);
-  if(count>1)   addOpt(`Sell All (×${count})`,-1,item.value*count,"sell-all-opt");
-  document.getElementById("sell-options").innerHTML=html;
+  const opt=(lbl,qty,gold,cls="")=>
+    html+=`<div class="sell-opt ${cls}" onclick="execSell(${qty})">
+      <div class="so-count">${lbl}</div><div class="so-gold">${gold}🪙</div></div>`;
+  opt("×1",1,item.value);
+  if(count>=5)  opt("×5",5,item.value*5);
+  if(count>=10) opt("×10",10,item.value*10);
+  if(count>1)   opt(`${t("sell_all")} (×${count})`,-1,item.value*count,"sell-opt-all");
+  document.getElementById("sell-opts").innerHTML=html;
   document.getElementById("sell-modal").classList.add("visible");
 }
-
-function closeSellModal(e) {
-  if (e && e.target!==document.getElementById("sell-modal")) return;
+function closeSellModal(e){
+  if(e&&e.target!==document.getElementById("sell-modal")) return;
   document.getElementById("sell-modal").classList.remove("visible");
   modalItem=null;
 }
-
-async function executeSell(qty) {
-  if (!modalItem) return;
-  const ITEMS = window._items||{};
-  try {
-    const data = await doSell(modalItem, qty);
-    updateGoldDisplay();
-    renderInventory();
-    document.getElementById("sell-modal").classList.remove("visible");
-    showToast(`💰 Sold for ${data.earnings}🪙!`);
-  } catch(e) {}
+async function execSell(qty){
+  if(!modalItem) return;
+  try{
+    const d=await apiFetch("/api/sell",{method:"POST",body:JSON.stringify({item_key:modalItem,quantity:qty})});
+    state.gold=d.gold;
+    state.inventory[modalItem]=(state.inventory[modalItem]||0)-d.sold;
+    if(state.inventory[modalItem]<=0) delete state.inventory[modalItem];
+    updateGold(); renderInventory();
+    showToast(`${t("sold_for")} ${d.earnings}🪙!`);
+  }catch(e){}
+  document.getElementById("sell-modal").classList.remove("visible");
   modalItem=null;
 }
-
-async function sellAll() {
+async function sellAll(){
   const items=Object.entries(state.inventory).filter(([,v])=>v>0);
-  if (!items.length){showToast("🎒 Inventory is empty!");return;}
-  try {
-    const data=await doSellAll();
-    updateGoldDisplay();
-    renderInventory();
-    showToast(`💰 Sold everything for ${data.earnings}🪙!`);
-  } catch(e){}
+  if(!items.length){showToast(t("inv_empty"));return;}
+  try{
+    const d=await apiFetch("/api/sell_all",{method:"POST"});
+    state.gold=d.gold; state.inventory={};
+    updateGold(); renderInventory();
+    showToast(`${t("sold_all_for")} ${d.earnings}🪙!`);
+  }catch(e){}
 }
 
-// ═══════════════════════════════════════════
-//  REFERRAL
-// ═══════════════════════════════════════════
-function shareReferral() {
-  const uid  = tg?.initDataUnsafe?.user?.id||"demo";
-  const link = `https://t.me/${BOT_USERNAME}?start=ref_${uid}`;
-  const text = "⚔️ Join me in Treasure Chest — a fantasy loot game! Open chests, collect legendary items.";
-  if (tg?.openTelegramLink) {
-    tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
-  } else if (navigator.share) {
-    navigator.share({title:"Treasure Chest",text,url:link});
-  } else {
-    navigator.clipboard?.writeText(link);
-    showToast("🔗 Link copied!");
-  }
+function shareRef(){
+  const uid=tg?.initDataUnsafe?.user?.id||"demo";
+  const link=`https://t.me/${BOT_USERNAME}?start=ref_${uid}`;
+  const txt=LANG==="ru"
+    ? "⚔️ Присоединяйся ко мне в Treasure Chest — фэнтезийная лут-игра!"
+    : "⚔️ Join me in Treasure Chest — a fantasy loot game!";
+  if(tg?.openTelegramLink) tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(txt)}`);
+  else if(navigator.share) navigator.share({url:link,text:txt});
+  else { navigator.clipboard?.writeText(link); showToast(t("link_copied")); }
 }
 
-// ═══════════════════════════════════════════
-//  TOAST / ERROR
-// ═══════════════════════════════════════════
-let toastTimer;
-function showToast(msg) {
-  const t=document.getElementById("toast");
-  t.textContent=msg; t.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove("show"),2200);
-}
-
-function showError(msg) {
-  const b=document.getElementById("error-banner");
-  b.textContent="⚠️ "+msg; b.style.display="block";
+let toastTmr;
+function showToast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  clearTimeout(toastTmr);
+  toastTmr=setTimeout(()=>el.classList.remove("show"),2400);
 }
 
 // ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
 (async()=>{
-  // Load items catalogue
-  apiFetch("/api/items").then(d=>{ window._items=d; });
-  // Load player data
-  try { await loadPlayer(); }
-  catch(e) { console.warn("Could not load player:", e); }
+  applyLang();
+  renderChests();
+  try{ await loadPlayer(); renderChests(); } catch(e){ console.warn(e); }
 })();
 </script>
 </body>
