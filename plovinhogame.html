@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
@@ -8,48 +8,42 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root {
-  --gold:#f0c040; --gold-dim:#a07820; --gold-glow:rgba(240,192,64,0.4);
-  --bg:#08070a; --bg2:#0f0e14; --panel:rgba(22,18,30,0.95);
-  --border:rgba(240,192,64,0.15); --text:#e8d8b0; --text-dim:#7a6e55;
-  --c-common:#9a9a9a; --c-uncommon:#2ecc71; --c-rare:#5dade2;
-  --c-epic:#c39bd3; --c-legendary:#f0c040;
+  --gold:#f0c040;--gold-dim:#a07820;--gold-glow:rgba(240,192,64,.4);
+  --bg:#08070a;--bg2:#0f0e14;--panel:rgba(22,18,30,.95);
+  --border:rgba(240,192,64,.15);--text:#e8d8b0;--text-dim:#7a6e55;
+  --c-common:#9a9a9a;--c-uncommon:#2ecc71;--c-rare:#5dade2;
+  --c-epic:#c39bd3;--c-legendary:#f0c040;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;width:100%;background:var(--bg);color:var(--text);
   font-family:'EB Garamond',serif;overflow:hidden;user-select:none}
-
-/* BG */
-#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
-
+canvas#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
 #app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
 /* HEADER */
 header{flex-shrink:0;padding:12px 16px 8px;
-  background:linear-gradient(180deg,rgba(8,7,10,.98) 0%,transparent 100%);
+  background:linear-gradient(180deg,rgba(8,7,10,.98),transparent);
   display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:'Cinzel Decorative',serif;font-size:14px;font-weight:700;
-  color:var(--gold);text-shadow:0 0 20px var(--gold-glow);line-height:1.2}
-.logo-sub{font-size:9px;color:var(--text-dim);font-family:'EB Garamond',serif;
-  text-transform:uppercase;letter-spacing:.15em}
+  color:var(--gold);text-shadow:0 0 20px var(--gold-glow)}
+.logo-sub{font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.15em}
 .gold-pill{display:flex;align-items:center;gap:6px;
   background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.22);
   border-radius:20px;padding:5px 12px}
 .gold-coin{font-size:15px;animation:coinspin 3s linear infinite}
 @keyframes coinspin{0%,44%{transform:rotateY(0)}50%{transform:rotateY(90deg)}56%,100%{transform:rotateY(0)}}
-#gold-display{font-family:'Cinzel',serif;font-size:14px;font-weight:600;
-  color:var(--gold);text-shadow:0 0 10px var(--gold-glow);min-width:40px;
-  text-align:right;transition:all .35s}
+#gold-disp{font-family:'Cinzel',serif;font-size:14px;font-weight:600;
+  color:var(--gold);min-width:40px;text-align:right;transition:all .3s}
 
 /* NAV */
 nav{flex-shrink:0;display:flex;gap:3px;padding:0 12px 8px}
-.nav-btn{flex:1;padding:7px 4px;background:transparent;border:1px solid transparent;
+.nb{flex:1;padding:7px 4px;background:transparent;border:1px solid transparent;
   border-radius:10px;color:var(--text-dim);font-family:'Cinzel',serif;font-size:9px;
   font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;
   transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px}
-.nav-btn .ni{font-size:17px}
-.nav-btn.active{background:rgba(240,192,64,.09);border-color:rgba(240,192,64,.3);
-  color:var(--gold);text-shadow:0 0 8px var(--gold-glow)}
-.nav-btn:active{transform:scale(.95)}
+.nb .ni{font-size:17px}
+.nb.active{background:rgba(240,192,64,.09);border-color:rgba(240,192,64,.3);color:var(--gold)}
+.nb:active{transform:scale(.95)}
 
 /* SCREENS */
 #screens{flex:1;overflow:hidden;position:relative}
@@ -59,226 +53,174 @@ nav{flex-shrink:0;display:flex;gap:3px;padding:0 12px 8px}
 .screen.active{opacity:1;transform:translateY(0);pointer-events:all}
 .screen::-webkit-scrollbar{width:2px}
 .screen::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
-
 .sec-title{font-family:'Cinzel',serif;font-size:10px;font-weight:600;
   letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);
   margin:14px 0 9px;display:flex;align-items:center;gap:8px}
-.sec-title::after{content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,var(--border),transparent)}
+.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 
-/* ════════════════════════
-   CHEST CARDS — main list
-════════════════════════ */
+/* CHEST CARDS */
 .chests-grid{display:flex;flex-direction:column;gap:10px;padding-top:2px}
 .chest-card{position:relative;overflow:hidden;border-radius:16px;
-  background:var(--panel);cursor:pointer;transition:transform .2s,box-shadow .2s;
-  display:flex;align-items:center;gap:0;border:1px solid transparent}
+  background:var(--panel);cursor:pointer;transition:transform .2s;
+  display:flex;align-items:center;border:1px solid transparent}
 .chest-card:active{transform:scale(.97)}
-
-/* per-tier colors */
-.chest-card.t1{border-color:rgba(139,90,43,.45);
-  background:linear-gradient(135deg,rgba(22,14,8,.97),rgba(28,18,10,.97))}
-.chest-card.t2{border-color:rgba(192,192,192,.3);
-  background:linear-gradient(135deg,rgba(16,16,22,.97),rgba(22,22,30,.97))}
-.chest-card.t3{border-color:rgba(240,192,64,.35);
-  background:linear-gradient(135deg,rgba(20,16,8,.97),rgba(28,22,8,.97));
-  box-shadow:0 0 18px rgba(240,192,64,.07)}
-.chest-card.t4{border-color:rgba(142,68,173,.45);
-  background:linear-gradient(135deg,rgba(16,10,22,.97),rgba(22,12,30,.97));
-  box-shadow:0 0 18px rgba(142,68,173,.07)}
-.chest-card.t5{border-color:rgba(231,76,60,.5);
-  background:linear-gradient(135deg,rgba(20,8,8,.97),rgba(30,10,10,.97));
-  box-shadow:0 0 22px rgba(231,76,60,.1)}
-.chest-card.t6{border-color:rgba(255,215,0,.6);
-  background:linear-gradient(135deg,rgba(20,16,0,.97),rgba(30,24,4,.97));
-  box-shadow:0 0 28px rgba(255,215,0,.12)}
-
-.chest-art{width:90px;height:90px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-size:52px;
-  filter:drop-shadow(0 0 10px rgba(240,192,64,.3));
-  animation:float 3s ease-in-out infinite}
-.chest-card.t2 .chest-art{filter:drop-shadow(0 2px 8px rgba(180,180,200,.3));animation-delay:.5s}
-.chest-card.t3 .chest-art{filter:drop-shadow(0 0 16px rgba(240,192,64,.5));animation-delay:1s}
-.chest-card.t4 .chest-art{filter:drop-shadow(0 0 16px rgba(142,68,173,.5));animation-delay:1.5s}
-.chest-card.t5 .chest-art{filter:drop-shadow(0 0 18px rgba(231,76,60,.5));animation-delay:2s}
-.chest-card.t6 .chest-art{filter:drop-shadow(0 0 24px rgba(255,215,0,.7));animation-delay:2.5s}
+.chest-card.t1{border-color:rgba(139,90,43,.45);background:linear-gradient(135deg,rgba(22,14,8,.97),rgba(28,18,10,.97))}
+.chest-card.t2{border-color:rgba(46,204,113,.3);background:linear-gradient(135deg,rgba(10,18,12,.97),rgba(14,24,16,.97))}
+.chest-card.t3{border-color:rgba(93,173,226,.35);background:linear-gradient(135deg,rgba(8,14,22,.97),rgba(10,18,28,.97))}
+.chest-card.t4{border-color:rgba(195,155,211,.4);background:linear-gradient(135deg,rgba(16,10,22,.97),rgba(22,12,30,.97))}
+.chest-card.t5{border-color:rgba(231,76,60,.45);background:linear-gradient(135deg,rgba(20,8,8,.97),rgba(30,10,10,.97))}
+.chest-card.t6{border-color:rgba(255,215,0,.55);background:linear-gradient(135deg,rgba(20,16,0,.97),rgba(30,24,4,.97));box-shadow:0 0 24px rgba(255,215,0,.1)}
+.chest-art{width:88px;height:88px;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;font-size:50px;animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
-
 .chest-info{flex:1;padding:14px 14px 14px 4px}
-.chest-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
-.chest-tier-badge{display:inline-block;font-family:'Cinzel',serif;font-size:9px;font-weight:600;
+.chest-name{font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.chest-tier{display:inline-block;font-family:'Cinzel',serif;font-size:9px;font-weight:600;
   padding:2px 8px;border-radius:8px;margin-bottom:6px;letter-spacing:.05em}
 .chest-desc{font-size:12px;color:var(--text-dim);font-style:italic;margin-bottom:8px;line-height:1.4}
 .chest-cost-row{display:flex;align-items:center;gap:6px}
-.chest-cost-num{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold);
-  text-shadow:0 0 10px var(--gold-glow)}
-.chest-cost-lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em}
-
+.chest-cost-num{font-family:'Cinzel',serif;font-size:16px;font-weight:700;
+  color:var(--gold);text-shadow:0 0 10px var(--gold-glow)}
+.chest-cost-lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase}
 .chest-card.locked{opacity:.4;pointer-events:none}
 
-/* ════════════════════════
-   CHEST DETAIL SCREEN
-════════════════════════ */
-#chest-detail{position:absolute;inset:0;z-index:50;
-  background:var(--bg);overflow-y:auto;overflow-x:hidden;
-  padding:0 0 30px;
-  opacity:0;transform:translateX(100%);pointer-events:none;
-  transition:opacity .3s,transform .3s}
-#chest-detail.open{opacity:1;transform:translateX(0);pointer-events:all}
-
-.detail-header{display:flex;align-items:center;gap:10px;
-  padding:14px 14px 0;margin-bottom:4px}
+/* DETAIL PANEL */
+#detail{position:absolute;inset:0;z-index:50;background:var(--bg);
+  overflow-y:auto;opacity:0;transform:translateX(100%);pointer-events:none;
+  transition:opacity .3s,transform .3s;padding-bottom:30px}
+#detail.open{opacity:1;transform:translateX(0);pointer-events:all}
+.det-hdr{display:flex;align-items:center;gap:10px;padding:14px 14px 0;margin-bottom:4px}
 .back-btn{width:36px;height:36px;background:rgba(240,192,64,.08);
-  border:1px solid rgba(240,192,64,.2);border-radius:10px;
-  color:var(--gold);font-size:18px;cursor:pointer;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;transition:all .2s}
-.back-btn:active{transform:scale(.92)}
-.detail-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text)}
-
-.detail-chest-hero{text-align:center;padding:10px 0 6px}
-.detail-chest-img{font-size:80px;filter:drop-shadow(0 0 20px rgba(240,192,64,.4));
-  animation:float 2.5s ease-in-out infinite;display:inline-block}
-.detail-chest-name{font-family:'Cinzel Decorative',serif;font-size:17px;font-weight:700;
-  color:var(--gold);text-shadow:0 0 16px var(--gold-glow);margin-top:6px}
-.detail-chest-desc{font-size:13px;color:var(--text-dim);font-style:italic;
+  border:1px solid rgba(240,192,64,.2);border-radius:10px;color:var(--gold);
+  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.back-btn:active{transform:scale(.9)}
+.det-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text)}
+.det-hero{text-align:center;padding:10px 0 4px}
+.det-icon{font-size:80px;animation:float 2.5s ease-in-out infinite;display:inline-block;
+  filter:drop-shadow(0 0 20px rgba(240,192,64,.4))}
+.det-name{font-family:'Cinzel Decorative',serif;font-size:16px;font-weight:700;
+  color:var(--gold);text-shadow:0 0 14px var(--gold-glow);margin-top:6px}
+.det-desc{font-size:13px;color:var(--text-dim);font-style:italic;
   margin:4px 14px 0;text-align:center;line-height:1.5}
-
-.open-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 0}
-.open-btn{padding:14px 10px;border-radius:14px;font-family:'Cinzel',serif;font-size:13px;
-  font-weight:700;cursor:pointer;transition:all .25s;text-align:center;border:none}
-.open-btn-slow{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.35);
-  color:var(--gold)}
-.open-btn-slow:active{background:rgba(240,192,64,.2)}
-.open-btn-fast{background:linear-gradient(135deg,#8a6010,#f0c040,#8a6010);
-  background-size:200%;background-position:100%;
-  color:#1a1000;box-shadow:0 4px 18px rgba(240,192,64,.3)}
-.open-btn-fast:active{background-position:0%}
-.open-btn .btn-icon{font-size:20px;display:block;margin-bottom:3px}
-.open-btn .btn-cost{font-size:11px;opacity:.75;margin-top:2px}
-
-/* drop table */
+.open-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.obtn{padding:16px 10px;border-radius:14px;font-family:'Cinzel',serif;font-size:13px;
+  font-weight:700;cursor:pointer;transition:all .25s;text-align:center;border:none;outline:none}
+.obtn-slow{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.35);color:var(--gold)}
+.obtn-slow:active{background:rgba(240,192,64,.22)}
+.obtn-fast{background:linear-gradient(135deg,#8a6010,#f0c040,#8a6010);
+  background-size:200%;background-position:100%;color:#1a1000;
+  box-shadow:0 4px 18px rgba(240,192,64,.3)}
+.obtn-fast:active{background-position:0%}
+.obtn .oi{font-size:22px;display:block;margin-bottom:4px}
+.obtn .oc{font-size:11px;opacity:.7;margin-top:3px}
 .drop-table{padding:0 14px}
-.drop-row{display:flex;align-items:center;gap:10px;
-  padding:9px 12px;border-radius:12px;margin-bottom:6px;
-  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
-  transition:background .2s}
-.drop-row:last-child{margin-bottom:0}
-.drop-emoji{font-size:24px;flex-shrink:0;width:32px;text-align:center}
-.drop-info{flex:1;min-width:0}
+.drop-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;
+  margin-bottom:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.drop-em{font-size:24px;flex-shrink:0;width:32px;text-align:center}
+.drop-info{flex:1}
 .drop-name{font-family:'Cinzel',serif;font-size:12px;font-weight:600}
-.drop-name.Common   {color:var(--c-common)}
-.drop-name.Uncommon {color:var(--c-uncommon)}
-.drop-name.Rare     {color:var(--c-rare)}
-.drop-name.Epic     {color:var(--c-epic)}
-.drop-name.Legendary{color:var(--c-legendary)}
-.drop-val{font-size:11px;color:var(--text-dim);margin-top:1px}
-.drop-chance{font-family:'Cinzel',serif;font-size:12px;font-weight:700;flex-shrink:0}
-.drop-chance.Common   {color:var(--c-common)}
-.drop-chance.Uncommon {color:var(--c-uncommon)}
-.drop-chance.Rare     {color:var(--c-rare)}
-.drop-chance.Epic     {color:var(--c-epic)}
-.drop-chance.Legendary{color:var(--c-legendary)}
+.drop-name.Common{color:var(--c-common)}.drop-name.Uncommon{color:var(--c-uncommon)}
+.drop-name.Rare{color:var(--c-rare)}.drop-name.Epic{color:var(--c-epic)}.drop-name.Legendary{color:var(--c-legendary)}
+.drop-sub{font-size:10px;color:var(--text-dim);margin-top:1px}
+.drop-pct{font-family:'Cinzel',serif;font-size:12px;font-weight:700;flex-shrink:0}
+.drop-pct.Common{color:var(--c-common)}.drop-pct.Uncommon{color:var(--c-uncommon)}
+.drop-pct.Rare{color:var(--c-rare)}.drop-pct.Epic{color:var(--c-epic)}.drop-pct.Legendary{color:var(--c-legendary)}
 
-/* ════════════════════════
-   SPIN ANIMATION
-════════════════════════ */
-#spin-screen{position:fixed;inset:0;z-index:100;
-  background:rgba(0,0,0,.97);
+/* ═══ SPIN OVERLAY ═══ */
+#spin-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.97);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .3s}
-#spin-screen.visible{opacity:1;pointer-events:all}
+  gap:0;opacity:0;pointer-events:none;transition:opacity .3s}
+#spin-overlay.on{opacity:1;pointer-events:all}
 
-.spin-chest-anim{font-size:70px;margin-bottom:16px;
-  filter:drop-shadow(0 0 20px rgba(240,192,64,.5));
-  animation:chest-shake .35s ease-in-out infinite}
-@keyframes chest-shake{0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.06)}}
-.spin-chest-anim.fast-mode{animation-duration:.15s}
+.spin-chest{font-size:72px;margin-bottom:14px;
+  filter:drop-shadow(0 0 24px rgba(240,192,64,.5))}
+.spin-chest.shake{animation:shake .3s ease-in-out infinite}
+.spin-chest.shake.fast{animation-duration:.12s}
+@keyframes shake{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.07)}}
 
-.spin-status{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.3em;
-  text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;
-  animation:pulse-txt .7s ease-in-out infinite alternate}
-@keyframes pulse-txt{from{opacity:.3}to{opacity:1}}
+.spin-label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--text-dim);margin-bottom:18px;
+  animation:blink .6s ease-in-out infinite alternate}
+@keyframes blink{from{opacity:.3}to{opacity:1}}
 
-/* reel */
-.reel-wrap{position:relative;width:calc(100vw - 0px);max-width:480px;height:120px;overflow:hidden}
-.reel-wrap::before,.reel-wrap::after{content:'';position:absolute;top:0;bottom:0;width:70px;z-index:5;pointer-events:none}
+/* REEL */
+.reel-wrap{position:relative;width:100%;max-width:480px;height:124px;overflow:hidden}
+.reel-wrap::before,.reel-wrap::after{content:'';position:absolute;top:0;bottom:0;
+  width:72px;z-index:5;pointer-events:none}
 .reel-wrap::before{left:0;background:linear-gradient(90deg,rgba(0,0,0,.97),transparent)}
 .reel-wrap::after{right:0;background:linear-gradient(-90deg,rgba(0,0,0,.97),transparent)}
 .reel-line{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);
-  width:2px;background:var(--gold);z-index:6;
+  width:2px;z-index:6;background:var(--gold);
   box-shadow:0 0 10px var(--gold-glow),0 0 24px var(--gold-glow)}
-.reel-line::before{content:'▼';position:absolute;top:-16px;left:50%;transform:translateX(-50%);
-  color:var(--gold);font-size:12px}
-.reel-line::after{content:'▲';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);
-  color:var(--gold);font-size:12px}
-.reel-track{display:flex;align-items:center;height:120px;gap:5px;padding:0 5px;will-change:transform}
-.reel-item{flex-shrink:0;width:100px;height:108px;border-radius:10px;
-  border:1.5px solid rgba(255,255,255,.07);
-  background:rgba(16,12,8,.95);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-.reel-item::after{content:'';display:block;width:80%;height:2px;border-radius:2px;margin-top:2px}
-.reel-item.Common::after   {background:var(--c-common)}
-.reel-item.Uncommon::after {background:var(--c-uncommon)}
-.reel-item.Rare::after     {background:var(--c-rare);box-shadow:0 0 6px var(--c-rare)}
-.reel-item.Epic::after     {background:var(--c-epic);box-shadow:0 0 8px var(--c-epic)}
-.reel-item.Legendary::after{background:var(--c-legendary);box-shadow:0 0 12px var(--c-legendary)}
-.ri-emoji{font-size:34px;line-height:1}
-.ri-name{font-family:'Cinzel',serif;font-size:7.5px;font-weight:600;
+.reel-line::before{content:'▼';position:absolute;top:-15px;left:50%;
+  transform:translateX(-50%);color:var(--gold);font-size:12px}
+.reel-line::after{content:'▲';position:absolute;bottom:-15px;left:50%;
+  transform:translateX(-50%);color:var(--gold);font-size:12px}
+.reel-track{display:flex;align-items:center;height:124px;gap:5px;padding:0 5px;will-change:transform}
+.ri{flex-shrink:0;width:100px;height:112px;border-radius:10px;
+  border:1.5px solid rgba(255,255,255,.07);background:rgba(14,10,8,.95);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  position:relative}
+.ri::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;border-radius:2px}
+.ri.Common::after{background:var(--c-common)}
+.ri.Uncommon::after{background:var(--c-uncommon)}
+.ri.Rare::after{background:var(--c-rare);box-shadow:0 0 6px var(--c-rare)}
+.ri.Epic::after{background:var(--c-epic);box-shadow:0 0 10px var(--c-epic)}
+.ri.Legendary::after{background:var(--c-legendary);box-shadow:0 0 14px var(--c-legendary)}
+.ri.Common{background:rgba(150,150,150,.06)}
+.ri.Uncommon{background:rgba(46,204,113,.06)}
+.ri.Rare{background:rgba(93,173,226,.07)}
+.ri.Epic{background:rgba(195,155,211,.08)}
+.ri.Legendary{background:rgba(240,192,64,.09)}
+.ri-em{font-size:36px;line-height:1}
+.ri-nm{font-family:'Cinzel',serif;font-size:7.5px;font-weight:600;
   text-align:center;padding:0 3px;color:var(--text-dim)}
-.ri-rarity{font-size:7px;font-family:'Cinzel',serif;font-weight:700}
-.ri-rarity.Common   {color:var(--c-common)}
-.ri-rarity.Uncommon {color:var(--c-uncommon)}
-.ri-rarity.Rare     {color:var(--c-rare)}
-.ri-rarity.Epic     {color:var(--c-epic)}
-.ri-rarity.Legendary{color:var(--c-legendary)}
+.ri-rar{font-size:7px;font-family:'Cinzel',serif;font-weight:700}
+.ri-rar.Common{color:var(--c-common)}.ri-rar.Uncommon{color:var(--c-uncommon)}
+.ri-rar.Rare{color:var(--c-rare)}.ri-rar.Epic{color:var(--c-epic)}.ri-rar.Legendary{color:var(--c-legendary)}
+.ri.winner{border-color:var(--gold) !important;
+  box-shadow:0 0 20px rgba(240,192,64,.5);transform:scale(1.06)}
+.ri.Legendary.winner{animation:legwin .5s ease-in-out infinite alternate}
+@keyframes legwin{from{box-shadow:0 0 20px rgba(240,192,64,.4)}to{box-shadow:0 0 50px rgba(240,192,64,.9)}}
 
-.reel-item.is-winner{border-color:var(--gold);
-  box-shadow:0 0 20px rgba(240,192,64,.4);transform:scale(1.05)}
-.reel-item.Legendary.is-winner{animation:leg-winner .5s ease-in-out infinite alternate}
-@keyframes leg-winner{from{box-shadow:0 0 20px rgba(240,192,64,.4)}to{box-shadow:0 0 50px rgba(240,192,64,.9)}}
-
-/* result */
-#spin-result{margin-top:22px;text-align:center;opacity:0;transform:translateY(16px);
-  transition:opacity .4s,transform .4s}
-#spin-result.show{opacity:1;transform:translateY(0)}
+/* RESULT */
+#spin-result{margin-top:20px;text-align:center;opacity:0;transform:translateY(14px);
+  transition:opacity .4s,transform .4s;pointer-events:none}
+#spin-result.show{opacity:1;transform:translateY(0);pointer-events:all}
 .res-badge{display:inline-block;font-family:'Cinzel',serif;font-size:10px;font-weight:700;
   padding:3px 14px;border-radius:16px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
-.res-badge.Common   {background:rgba(155,155,155,.15);color:var(--c-common);border:1px solid rgba(155,155,155,.3)}
-.res-badge.Uncommon {background:rgba(46,204,113,.12);color:var(--c-uncommon);border:1px solid rgba(46,204,113,.3)}
-.res-badge.Rare     {background:rgba(93,173,226,.12);color:var(--c-rare);border:1px solid rgba(93,173,226,.35)}
-.res-badge.Epic     {background:rgba(195,155,211,.12);color:var(--c-epic);border:1px solid rgba(195,155,211,.4);box-shadow:0 0 16px rgba(195,155,211,.2)}
+.res-badge.Common{background:rgba(155,155,155,.15);color:var(--c-common);border:1px solid rgba(155,155,155,.3)}
+.res-badge.Uncommon{background:rgba(46,204,113,.12);color:var(--c-uncommon);border:1px solid rgba(46,204,113,.3)}
+.res-badge.Rare{background:rgba(93,173,226,.12);color:var(--c-rare);border:1px solid rgba(93,173,226,.35)}
+.res-badge.Epic{background:rgba(195,155,211,.12);color:var(--c-epic);border:1px solid rgba(195,155,211,.4);box-shadow:0 0 16px rgba(195,155,211,.2)}
 .res-badge.Legendary{background:rgba(240,192,64,.12);color:var(--c-legendary);border:1px solid rgba(240,192,64,.5);box-shadow:0 0 24px rgba(240,192,64,.35)}
 .res-name{font-family:'Cinzel',serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:3px}
 .res-name.Legendary{color:var(--c-legendary);text-shadow:0 0 20px var(--gold-glow)}
-.res-name.Epic{color:var(--c-epic)}
-.res-val{font-size:13px;color:var(--text-dim);font-style:italic;margin-bottom:14px}
-.res-val span{color:var(--gold);font-style:normal;font-family:'Cinzel',serif}
-.res-actions{display:flex;gap:10px;justify-content:center}
-.btn-keep{padding:11px 22px;background:linear-gradient(135deg,#8a6010,#f0c040,#8a6010);
-  background-size:200%;background-position:100%;
-  border:none;border-radius:12px;font-family:'Cinzel',serif;font-size:13px;
-  font-weight:700;color:#1a1000;cursor:pointer;transition:all .3s;
-  box-shadow:0 4px 18px rgba(240,192,64,.3)}
-.btn-keep:active{background-position:0%}
-.btn-sell-now{padding:11px 18px;background:rgba(255,255,255,.05);
+.res-name.Epic{color:var(--c-epic)}.res-name.Rare{color:var(--c-rare)}
+.res-val{font-size:13px;color:var(--text-dim);font-style:italic;margin-bottom:16px}
+.res-val b{color:var(--gold);font-style:normal;font-family:'Cinzel',serif}
+.res-btns{display:flex;gap:10px;justify-content:center}
+.btn-keep{padding:12px 22px;background:linear-gradient(135deg,#8a6010,#f0c040,#8a6010);
+  background-size:200%;background-position:100%;border:none;border-radius:12px;
+  font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:#1a1000;cursor:pointer;
+  transition:all .3s;box-shadow:0 4px 18px rgba(240,192,64,.3)}
+.btn-keep:active{background-position:0%;transform:scale(.96)}
+.btn-sell-r{padding:12px 18px;background:rgba(255,255,255,.05);
   border:1px solid var(--border);border-radius:12px;font-family:'Cinzel',serif;
   font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;transition:all .2s}
-.btn-sell-now:active{transform:scale(.96)}
+.btn-sell-r:active{transform:scale(.96)}
 
-/* particles */
-.particles{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+/* PARTICLES */
+.pts{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden}
 .pt{position:absolute;border-radius:50%;animation:ptfly 2s ease-out forwards;opacity:0}
 @keyframes ptfly{0%{transform:translate(0,0) scale(0);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
-/* ════════════════════════
-   INVENTORY
-════════════════════════ */
+/* INVENTORY */
 .inv-top{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
-.stat-box{background:var(--panel);border:1px solid var(--border);
-  border-radius:12px;padding:10px 12px}
-.stat-box-lbl{font-size:9px;color:var(--text-dim);text-transform:uppercase;
+.sbox{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+.sbox-lbl{font-size:9px;color:var(--text-dim);text-transform:uppercase;
   letter-spacing:.1em;font-family:'Cinzel',serif;margin-bottom:3px}
-.stat-box-val{font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:var(--gold)}
+.sbox-val{font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:var(--gold)}
 .sell-all-btn{width:100%;padding:11px;background:rgba(192,57,43,.1);
   border:1px solid rgba(192,57,43,.25);border-radius:12px;font-family:'Cinzel',serif;
   font-size:11px;font-weight:600;color:#e74c3c;letter-spacing:.08em;text-transform:uppercase;
@@ -288,60 +230,60 @@ nav{flex-shrink:0;display:flex;gap:3px;padding:0 12px 8px}
   border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:7px;
   cursor:pointer;transition:all .18s}
 .inv-item:active{transform:scale(.98);background:rgba(240,192,64,.05)}
-.inv-item.rarity-Legendary{border-color:rgba(240,192,64,.4);box-shadow:0 0 10px rgba(240,192,64,.07)}
-.inv-item.rarity-Epic{border-color:rgba(195,155,211,.35)}
-.inv-item.rarity-Rare{border-color:rgba(93,173,226,.3)}
-.ii-emoji{font-size:26px;flex-shrink:0}
+.inv-item.rL{border-color:rgba(240,192,64,.4);box-shadow:0 0 10px rgba(240,192,64,.07)}
+.inv-item.rE{border-color:rgba(195,155,211,.35)}
+.inv-item.rR{border-color:rgba(93,173,226,.3)}
+.ii-em{font-size:26px;flex-shrink:0}
 .ii-info{flex:1;min-width:0}
 .ii-name{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--text)}
-.ii-rarity{font-size:10px;margin-top:1px}
-.ii-rarity.Common{color:var(--c-common)}.ii-rarity.Uncommon{color:var(--c-uncommon)}
-.ii-rarity.Rare{color:var(--c-rare)}.ii-rarity.Epic{color:var(--c-epic)}.ii-rarity.Legendary{color:var(--c-legendary)}
+.ii-rar{font-size:10px;margin-top:1px}
+.ii-rar.Common{color:var(--c-common)}.ii-rar.Uncommon{color:var(--c-uncommon)}
+.ii-rar.Rare{color:var(--c-rare)}.ii-rar.Epic{color:var(--c-epic)}.ii-rar.Legendary{color:var(--c-legendary)}
 .ii-right{text-align:right;flex-shrink:0}
-.ii-count{font-family:'Cinzel',serif;font-size:11px;color:var(--text-dim)}
+.ii-cnt{font-family:'Cinzel',serif;font-size:11px;color:var(--text-dim)}
 .ii-val{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--gold);margin-top:1px}
 
 /* SELL MODAL */
-#sell-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.82);
+#sell-modal{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.82);
   display:flex;align-items:flex-end;justify-content:center;
   opacity:0;pointer-events:none;transition:opacity .28s}
-#sell-modal.visible{opacity:1;pointer-events:all}
+#sell-modal.on{opacity:1;pointer-events:all}
 .sell-sheet{width:100%;max-width:480px;background:var(--bg2);
   border:1px solid var(--border);border-bottom:none;border-radius:22px 22px 0 0;
-  padding:24px 20px 32px;transform:translateY(100%);
+  padding:22px 20px 30px;transform:translateY(100%);
   transition:transform .32s cubic-bezier(.32,.72,0,1)}
-#sell-modal.visible .sell-sheet{transform:translateY(0)}
-.sell-handle{width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 18px}
-.sell-item-hdr{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-.sell-item-em{font-size:48px}
-.sell-item-nm{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text)}
-.sell-item-sb{font-size:12px;color:var(--text-dim);margin-top:2px;font-style:italic}
+#sell-modal.on .sell-sheet{transform:translateY(0)}
+.sell-handle{width:36px;height:3px;background:var(--border);border-radius:2px;margin:0 auto 16px}
+.sell-hdr{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.sell-em{font-size:46px}
+.sell-nm{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text)}
+.sell-sb{font-size:12px;color:var(--text-dim);margin-top:2px;font-style:italic}
 .sell-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sell-opt{padding:13px 8px;border-radius:12px;background:rgba(240,192,64,.05);
+.sopt{padding:13px 8px;border-radius:12px;background:rgba(240,192,64,.05);
   border:1px solid rgba(240,192,64,.18);text-align:center;cursor:pointer;transition:all .18s}
-.sell-opt:active{background:rgba(240,192,64,.14);transform:scale(.96)}
-.sell-opt.sell-opt-all{grid-column:1/-1;background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.25)}
-.so-count{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
-.so-gold{font-size:11px;color:var(--gold)}
+.sopt:active{background:rgba(240,192,64,.14);transform:scale(.96)}
+.sopt.sopt-all{grid-column:1/-1;background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.25)}
+.sopt-cnt{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.sopt-g{font-size:11px;color:var(--gold)}
 .sell-cancel{width:100%;margin-top:10px;padding:11px;background:transparent;
   border:1px solid var(--border);border-radius:12px;color:var(--text-dim);
   font-family:'Cinzel',serif;font-size:11px;cursor:pointer}
 
 /* PROFILE */
-.profile-hero{background:var(--panel);border:1px solid var(--border);
+.prof-hero{background:var(--panel);border:1px solid var(--border);
   border-radius:16px;padding:18px;margin-bottom:10px;text-align:center;
   position:relative;overflow:hidden}
-.profile-hero::before{content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 0%,rgba(240,192,64,.07) 0%,transparent 70%)}
-.ph-avatar{font-size:50px;margin-bottom:6px;filter:drop-shadow(0 0 14px rgba(240,192,64,.35))}
-.ph-name{font-family:'Cinzel',serif;font-size:18px;font-weight:700;
+.prof-hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(240,192,64,.07),transparent 70%)}
+.ph-av{font-size:50px;margin-bottom:6px;filter:drop-shadow(0 0 14px rgba(240,192,64,.35))}
+.ph-nm{font-family:'Cinzel',serif;font-size:18px;font-weight:700;
   color:var(--gold);text-shadow:0 0 12px var(--gold-glow)}
-.ph-sub{font-size:12px;color:var(--text-dim);margin-top:3px;font-style:italic}
-.profile-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.ps{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px}
-.ps-icon{font-size:18px;margin-bottom:4px}
-.ps-val{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold)}
-.ps-lbl{font-size:10px;color:var(--text-dim);text-transform:uppercase;
+.ph-sb{font-size:12px;color:var(--text-dim);margin-top:3px;font-style:italic}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pst{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px}
+.pst-ic{font-size:18px;margin-bottom:4px}
+.pst-v{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold)}
+.pst-l{font-size:10px;color:var(--text-dim);text-transform:uppercase;
   letter-spacing:.06em;font-family:'Cinzel',serif;margin-top:1px}
 .ref-card{background:var(--panel);border:1px solid rgba(240,192,64,.28);
   border-radius:16px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden}
@@ -349,219 +291,197 @@ nav{flex-shrink:0;display:flex;gap:3px;padding:0 12px 8px}
   background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5}
 .ref-title{font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:5px}
 .ref-desc{font-size:12px;color:var(--text-dim);font-style:italic;margin-bottom:12px}
-.ref-reward-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;
+.ref-rew{display:flex;align-items:center;gap:8px;margin-bottom:12px;
   padding:9px 12px;background:rgba(240,192,64,.07);border-radius:10px;border:1px solid rgba(240,192,64,.18)}
-.rr-txt{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--gold)}
-.rr-sub{font-size:11px;color:var(--text-dim)}
-.ref-link-lbl{font-family:'Cinzel',serif;font-size:9px;color:var(--text-dim);
+.ref-rew-t{font-family:'Cinzel',serif;font-size:13px;font-weight:600;color:var(--gold)}
+.ref-rew-s{font-size:11px;color:var(--text-dim)}
+.ref-lbl{font-family:'Cinzel',serif;font-size:9px;color:var(--text-dim);
   text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
-.ref-link-box{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:9px;
+.ref-link{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:9px;
   padding:9px 12px;font-size:11px;color:var(--text-dim);font-family:monospace;
   word-break:break-all;margin-bottom:9px}
-.ref-share-btn{width:100%;padding:12px;
+.ref-share{width:100%;padding:12px;
   background:linear-gradient(135deg,rgba(240,192,64,.12),rgba(240,192,64,.06));
   border:1px solid rgba(240,192,64,.3);border-radius:12px;font-family:'Cinzel',serif;
   font-size:12px;font-weight:700;color:var(--gold);cursor:pointer;transition:all .18s}
-.ref-share-btn:active{background:rgba(240,192,64,.18);transform:scale(.98)}
-.ref-person{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;
+.ref-share:active{background:rgba(240,192,64,.18);transform:scale(.98)}
+.ref-pers{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:6px;
   background:var(--panel);border:1px solid var(--border);border-radius:12px}
-.rp-name{font-family:'Cinzel',serif;font-size:12px;color:var(--text);flex:1}
+.rp-nm{font-family:'Cinzel',serif;font-size:12px;color:var(--text);flex:1}
 .rp-ts{font-size:10px;color:var(--text-dim)}
-.rp-gold{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--gold)}
+.rp-g{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:var(--gold)}
 
 /* SETTINGS */
-.settings-card{background:var(--panel);border:1px solid var(--border);
+.set-card{background:var(--panel);border:1px solid var(--border);
   border-radius:16px;padding:16px;margin-bottom:10px}
-.settings-title{font-family:'Cinzel',serif;font-size:12px;font-weight:700;
-  color:var(--gold);margin-bottom:14px;letter-spacing:.08em;text-transform:uppercase}
-.setting-row{display:flex;align-items:center;justify-content:space-between;
+.set-card-title{font-family:'Cinzel',serif;font-size:11px;font-weight:700;
+  color:var(--gold);margin-bottom:12px;letter-spacing:.08em;text-transform:uppercase}
+.set-row{display:flex;align-items:center;justify-content:space-between;
   padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.setting-row:last-child{border-bottom:none;padding-bottom:0}
-.setting-lbl{font-family:'Cinzel',serif;font-size:13px;color:var(--text)}
-.setting-sub{font-size:11px;color:var(--text-dim);margin-top:2px;font-style:italic}
-.toggle{width:44px;height:24px;background:rgba(255,255,255,.1);border-radius:12px;
-  position:relative;cursor:pointer;transition:background .25s;flex-shrink:0;border:none}
-.toggle.on{background:var(--gold)}
-.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;
-  background:#fff;border-radius:50%;transition:transform .25s;
-  box-shadow:0 1px 4px rgba(0,0,0,.4)}
-.toggle.on::after{transform:translateX(20px)}
-.lang-switcher{display:flex;gap:4px}
+.set-row:last-child{border-bottom:none;padding-bottom:0}
+.set-lbl{font-family:'Cinzel',serif;font-size:13px;color:var(--text)}
+.set-sub{font-size:11px;color:var(--text-dim);margin-top:2px;font-style:italic}
+.lang-sw{display:flex;gap:4px}
 .lang-btn{padding:4px 10px;border-radius:8px;font-family:'Cinzel',serif;font-size:11px;
   font-weight:600;cursor:pointer;transition:all .2s;border:1px solid var(--border);
   background:transparent;color:var(--text-dim)}
-.lang-btn.active{background:rgba(240,192,64,.15);border-color:rgba(240,192,64,.4);color:var(--gold)}
+.lang-btn.on{background:rgba(240,192,64,.15);border-color:rgba(240,192,64,.4);color:var(--gold)}
 
 /* TOAST */
-#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(16px);
-  z-index:400;background:rgba(16,12,8,.97);border:1px solid var(--border);
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(14px);
+  z-index:500;background:rgba(14,10,8,.97);border:1px solid var(--border);
   border-radius:12px;padding:10px 18px;font-family:'Cinzel',serif;font-size:12px;
-  color:var(--text);white-space:nowrap;opacity:0;pointer-events:none;transition:all .28s;
-  box-shadow:0 8px 28px rgba(0,0,0,.5)}
+  color:var(--text);white-space:nowrap;opacity:0;pointer-events:none;transition:all .28s}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-.empty-state{text-align:center;padding:44px 20px}
-.es-icon{font-size:48px;margin-bottom:12px;opacity:.35}
-.es-txt{font-family:'Cinzel',serif;font-size:13px;color:var(--text-dim);font-weight:600;margin-bottom:4px}
-.es-sub{font-size:12px;color:var(--text-dim);opacity:.5;font-style:italic}
+.empty{text-align:center;padding:44px 20px}
+.empty-ic{font-size:48px;margin-bottom:12px;opacity:.35}
+.empty-t{font-family:'Cinzel',serif;font-size:13px;color:var(--text-dim);font-weight:600;margin-bottom:4px}
+.empty-s{font-size:12px;color:var(--text-dim);opacity:.5;font-style:italic}
 </style>
 </head>
 <body>
-<canvas id="bg-canvas"></canvas>
-<div class="particles" id="particles"></div>
+<canvas id="bgc"></canvas>
+<div class="pts" id="pts"></div>
 
 <div id="app">
   <header>
     <div>
-      <div class="logo" id="logo-txt">Treasure Chest</div>
-      <div class="logo-sub" id="logo-sub">Fantasy Loot Game</div>
+      <div class="logo" id="logo-t">Treasure Chest</div>
+      <div class="logo-sub" id="logo-s">Фэнтезийная лут-игра</div>
     </div>
     <div class="gold-pill">
       <span class="gold-coin">🪙</span>
-      <span id="gold-display">—</span>
+      <span id="gold-disp">—</span>
     </div>
   </header>
 
   <nav>
-    <button class="nav-btn active" onclick="showScreen('chests')" id="nav-chests">
-      <span class="ni">🗃️</span><span data-i="nav_chests">Chests</span>
+    <button class="nb active" onclick="showScr('chests')" id="nav-chests">
+      <span class="ni">🗃️</span><span id="nl-chests">Кейсы</span>
     </button>
-    <button class="nav-btn" onclick="showScreen('inventory')" id="nav-inventory">
-      <span class="ni">🎒</span><span data-i="nav_inv">Bag</span>
+    <button class="nb" onclick="showScr('inv')" id="nav-inv">
+      <span class="ni">🎒</span><span id="nl-inv">Инвентарь</span>
     </button>
-    <button class="nav-btn" onclick="showScreen('profile')" id="nav-profile">
-      <span class="ni">👤</span><span data-i="nav_prof">Profile</span>
+    <button class="nb" onclick="showScr('profile')" id="nav-profile">
+      <span class="ni">👤</span><span id="nl-profile">Профиль</span>
     </button>
-    <button class="nav-btn" onclick="showScreen('settings')" id="nav-settings">
-      <span class="ni">⚙️</span><span data-i="nav_set">Settings</span>
+    <button class="nb" onclick="showScr('settings')" id="nav-settings">
+      <span class="ni">⚙️</span><span id="nl-settings">Настройки</span>
     </button>
   </nav>
 
-  <div id="screens" style="position:relative">
-
+  <div id="screens">
     <!-- CHESTS -->
     <div class="screen active" id="screen-chests">
-      <div class="sec-title" data-i="choose_chest">Choose Your Chest</div>
+      <div class="sec-title" id="t-choose">Выбери кейс</div>
       <div class="chests-grid" id="chests-grid"></div>
     </div>
 
     <!-- INVENTORY -->
-    <div class="screen" id="screen-inventory">
+    <div class="screen" id="screen-inv">
       <div class="inv-top">
-        <div class="stat-box">
-          <div class="stat-box-lbl" data-i="items">Items</div>
-          <div class="stat-box-val" id="inv-count">—</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-box-lbl" data-i="total_val">Total Value</div>
-          <div class="stat-box-val" id="inv-value">—</div>
-        </div>
+        <div class="sbox"><div class="sbox-lbl" id="t-items">Предметы</div><div class="sbox-val" id="inv-count">—</div></div>
+        <div class="sbox"><div class="sbox-lbl" id="t-tval">Общая цена</div><div class="sbox-val" id="inv-val">—</div></div>
       </div>
-      <button class="sell-all-btn" onclick="sellAll()">🗑️ <span data-i="sell_all">Sell Everything</span></button>
-      <div class="sec-title" data-i="your_items">Your Items</div>
+      <button class="sell-all-btn" onclick="sellAll()">🗑️ <span id="t-sellall">Продать всё</span></button>
+      <div class="sec-title" id="t-youritems">Твои предметы</div>
       <div id="inv-list"></div>
     </div>
 
     <!-- PROFILE -->
     <div class="screen" id="screen-profile">
-      <div class="profile-hero">
-        <div class="ph-avatar">⚔️</div>
-        <div class="ph-name" id="profile-name">Adventurer</div>
-        <div class="ph-sub" data-i="treasure_hunter">Treasure Hunter</div>
+      <div class="prof-hero">
+        <div class="ph-av">⚔️</div>
+        <div class="ph-nm" id="prof-name">Авантюрист</div>
+        <div class="ph-sb" id="t-hunter">Охотник за сокровищами</div>
       </div>
-      <div class="profile-stats">
-        <div class="ps"><div class="ps-icon">📦</div><div class="ps-val" id="stat-chests">—</div><div class="ps-lbl" data-i="chests_opened">Chests Opened</div></div>
-        <div class="ps"><div class="ps-icon">💸</div><div class="ps-val" id="stat-earned">—</div><div class="ps-lbl" data-i="total_sold">Total Sold</div></div>
-        <div class="ps"><div class="ps-icon">👥</div><div class="ps-val" id="stat-refs">—</div><div class="ps-lbl" data-i="referrals">Referrals</div></div>
-        <div class="ps"><div class="ps-icon">💎</div><div class="ps-val" id="stat-nw">—</div><div class="ps-lbl" data-i="net_worth">Net Worth</div></div>
+      <div class="prof-stats">
+        <div class="pst"><div class="pst-ic">📦</div><div class="pst-v" id="s-chests">—</div><div class="pst-l" id="t-opened">Открыто кейсов</div></div>
+        <div class="pst"><div class="pst-ic">💸</div><div class="pst-v" id="s-earned">—</div><div class="pst-l" id="t-sold">Продано на</div></div>
+        <div class="pst"><div class="pst-ic">👥</div><div class="pst-v" id="s-refs">—</div><div class="pst-l" id="t-refs">Рефералы</div></div>
+        <div class="pst"><div class="pst-ic">💎</div><div class="pst-v" id="s-nw">—</div><div class="pst-l" id="t-nw">Капитал</div></div>
       </div>
       <div class="ref-card">
-        <div class="ref-title">👥 <span data-i="ref_program">Referral Program</span></div>
-        <div class="ref-desc" data-i="ref_desc">Invite friends and earn gold for each adventurer who joins!</div>
-        <div class="ref-reward-row">
-          <span style="font-size:18px">🪙</span>
-          <div><div class="rr-txt">+500 <span data-i="gold_per_ref">Gold per referral</span></div><div class="rr-sub" data-i="paid_instantly">Paid instantly when they join</div></div>
+        <div class="ref-title">👥 <span id="t-refprog">Реферальная программа</span></div>
+        <div class="ref-desc" id="t-refdesc">Приглашай друзей и получай золото за каждого нового игрока!</div>
+        <div class="ref-rew"><span style="font-size:18px">🪙</span>
+          <div><div class="ref-rew-t">+500 <span id="t-perref">золота за реферала</span></div>
+          <div class="ref-rew-s" id="t-instant">Начисляется сразу при входе</div></div>
         </div>
-        <div class="ref-link-lbl" data-i="your_link">Your Link</div>
-        <div class="ref-link-box" id="ref-link-box">—</div>
-        <button class="ref-share-btn" onclick="shareRef()">🔗 <span data-i="share_link">Share Referral Link</span></button>
+        <div class="ref-lbl" id="t-yourlink">Твоя ссылка</div>
+        <div class="ref-link" id="ref-link-box">—</div>
+        <button class="ref-share" onclick="shareRef()">🔗 <span id="t-sharelink">Поделиться ссылкой</span></button>
       </div>
-      <div class="sec-title" data-i="your_refs">Your Referrals</div>
+      <div class="sec-title" id="t-yourrefs">Твои рефералы</div>
       <div id="ref-list"></div>
     </div>
 
     <!-- SETTINGS -->
     <div class="screen" id="screen-settings">
-      <div class="settings-card">
-        <div class="settings-title" data-i="language">🌐 Language / Язык</div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-lbl">Interface Language</div>
-            <div class="setting-sub">Язык интерфейса</div>
-          </div>
-          <div class="lang-switcher">
-            <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
-            <button class="lang-btn" id="lang-ru" onclick="setLang('ru')">RU</button>
+      <div class="set-card">
+        <div class="set-card-title">🌐 Language / Язык</div>
+        <div class="set-row">
+          <div><div class="set-lbl">Interface Language</div><div class="set-sub">Язык интерфейса</div></div>
+          <div class="lang-sw">
+            <button class="lang-btn" id="lb-en" onclick="setLang('en')">EN</button>
+            <button class="lang-btn on" id="lb-ru" onclick="setLang('ru')">RU</button>
           </div>
         </div>
       </div>
-      <div class="settings-card">
-        <div class="settings-title" data-i="about">⚔️ About</div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-lbl">Treasure Chest</div>
-            <div class="setting-sub" data-i="about_desc">Fantasy loot game</div>
-          </div>
+      <div class="set-card">
+        <div class="set-card-title" id="t-about">⚔️ О игре</div>
+        <div class="set-row">
+          <div><div class="set-lbl">Treasure Chest v2.0</div>
+          <div class="set-sub" id="t-aboutd">Фэнтезийная лут-игра</div></div>
         </div>
       </div>
     </div>
-
-  </div><!-- /screens -->
-
-  <!-- CHEST DETAIL -->
-  <div id="chest-detail">
-    <div class="detail-header">
-      <button class="back-btn" onclick="closeDetail()">‹</button>
-      <div class="detail-title" id="detail-title">—</div>
-    </div>
-    <div class="detail-chest-hero">
-      <div class="detail-chest-img" id="detail-chest-img">📦</div>
-      <div class="detail-chest-name" id="detail-chest-name">—</div>
-      <div class="detail-chest-desc" id="detail-chest-desc">—</div>
-    </div>
-    <div class="open-buttons">
-      <button class="open-btn open-btn-slow" onclick="doOpen(false)">
-        <span class="btn-icon">⏳</span>
-        <span data-i="open_slow">Open Slowly</span>
-        <div class="btn-cost" id="btn-cost-slow">— 🪙</div>
-      </button>
-      <button class="open-btn open-btn-fast" onclick="doOpen(true)">
-        <span class="btn-icon">⚡</span>
-        <span data-i="open_fast">Open Fast</span>
-        <div class="btn-cost" id="btn-cost-fast">— 🪙</div>
-      </button>
-    </div>
-    <div class="sec-title" style="margin:14px 14px 8px" data-i="possible_drops">Possible Drops</div>
-    <div class="drop-table" id="drop-table"></div>
   </div>
 
-</div><!-- /app -->
+  <!-- CHEST DETAIL -->
+  <div id="detail">
+    <div class="det-hdr">
+      <button class="back-btn" onclick="closeDetail()">‹</button>
+      <div class="det-title" id="det-title">—</div>
+    </div>
+    <div class="det-hero">
+      <div class="det-icon" id="det-icon">📦</div>
+      <div class="det-name" id="det-name">—</div>
+      <div class="det-desc" id="det-desc">—</div>
+    </div>
+    <div class="open-btns">
+      <button class="obtn obtn-slow" id="obtn-slow" onclick="doOpen(false)">
+        <span class="oi">⏳</span>
+        <span id="t-openslow">Открыть медленно</span>
+        <div class="oc" id="cost-slow">— 🪙</div>
+      </button>
+      <button class="obtn obtn-fast" id="obtn-fast" onclick="doOpen(true)">
+        <span class="oi">⚡</span>
+        <span id="t-openfast">Открыть быстро</span>
+        <div class="oc" id="cost-fast">— 🪙</div>
+      </button>
+    </div>
+    <div class="sec-title" style="margin:14px 14px 8px" id="t-drops">Возможные предметы</div>
+    <div class="drop-table" id="drop-table"></div>
+  </div>
+</div>
 
-<!-- SPIN SCREEN -->
-<div id="spin-screen">
-  <div class="spin-chest-anim" id="spin-chest">📦</div>
-  <div class="spin-status" id="spin-status">Opening...</div>
+<!-- SPIN OVERLAY -->
+<div id="spin-overlay">
+  <div class="spin-chest" id="spin-chest">📦</div>
+  <div class="spin-label" id="spin-label">Открываем...</div>
   <div class="reel-wrap">
     <div class="reel-line"></div>
     <div class="reel-track" id="reel-track"></div>
   </div>
   <div id="spin-result">
     <div class="res-badge" id="res-badge">Common</div>
-    <div class="res-name" id="res-name">Item</div>
-    <div class="res-val"><span data-i="worth">Worth</span> <span id="res-val">0</span>🪙</div>
-    <div class="res-actions" style="margin-top:14px">
-      <button class="btn-keep" onclick="keepItem()" data-i="keep_it">Keep It</button>
-      <button class="btn-sell-now" onclick="sellNow()" data-i="sell_now">Sell Now</button>
+    <div class="res-name" id="res-name">—</div>
+    <div class="res-val">Стоимость: <b id="res-val">0</b>🪙</div>
+    <div class="res-btns">
+      <button class="btn-keep" onclick="keepItem()" id="btn-keep">В инвентарь</button>
+      <button class="btn-sell-r" onclick="sellNow()" id="btn-sell-r">Продать</button>
     </div>
   </div>
 </div>
@@ -570,283 +490,249 @@ nav{flex-shrink:0;display:flex;gap:3px;padding:0 12px 8px}
 <div id="sell-modal" onclick="closeSellModal(event)">
   <div class="sell-sheet">
     <div class="sell-handle"></div>
-    <div class="sell-item-hdr">
-      <div class="sell-item-em" id="modal-em">🧪</div>
-      <div>
-        <div class="sell-item-nm" id="modal-nm">—</div>
-        <div class="sell-item-sb" id="modal-sb">—</div>
-      </div>
+    <div class="sell-hdr">
+      <div class="sell-em" id="modal-em">🧪</div>
+      <div><div class="sell-nm" id="modal-nm">—</div><div class="sell-sb" id="modal-sb">—</div></div>
     </div>
     <div class="sell-opts" id="sell-opts"></div>
-    <button class="sell-cancel" onclick="closeSellModal()" data-i="cancel">Cancel</button>
+    <button class="sell-cancel" onclick="closeSellModal()" id="t-cancel">Отмена</button>
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════
-//  CONFIG
-// ═══════════════════════════════════════════
-const API_BASE     = "https://treasure-chest-bot.onrender.com"; // ← замени на Render URL
+// ═══════════════════════════
+//  CONFIG — замени URL!
+// ═══════════════════════════
+const API_BASE     = "https://treasure-chest-bot.onrender.com";
 const BOT_USERNAME = "plovinhogame_bot";
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 //  TRANSLATIONS
-// ═══════════════════════════════════════════
-const T = {
-  en: {
-    nav_chests:"Chests", nav_inv:"Bag", nav_prof:"Profile", nav_set:"Settings",
-    choose_chest:"Choose Your Chest",
-    items:"Items", total_val:"Total Value", sell_all:"Sell Everything",
-    your_items:"Your Items", treasure_hunter:"Treasure Hunter",
-    chests_opened:"Chests Opened", total_sold:"Total Sold",
-    referrals:"Referrals", net_worth:"Net Worth",
-    ref_program:"Referral Program",
-    ref_desc:"Invite friends and earn gold for each adventurer who joins!",
-    gold_per_ref:"Gold per referral", paid_instantly:"Paid instantly when they join",
-    your_link:"Your Link", share_link:"Share Referral Link", your_refs:"Your Referrals",
-    language:"🌐 Language / Язык", about:"⚔️ About", about_desc:"Fantasy loot game",
-    open_slow:"Open Slowly", open_fast:"Open Fast",
-    possible_drops:"Possible Drops",
-    opening:"Opening...", keep_it:"Keep It", sell_now:"Sell Now", worth:"Worth",
-    cancel:"Cancel",
-    not_enough:"❌ Not enough gold!",
-    added_inv:"🎒 Added to inventory!",
-    sold_for:"💰 Sold for",
-    sold_all_for:"💰 Sold everything for",
-    inv_empty:"🎒 Inventory is empty!",
-    items_label:"items", value_label:"value",
-    link_copied:"🔗 Link copied!",
-    no_referrals_title:"No Referrals Yet",
-    no_referrals_sub:"Share your link to earn 500🪙!",
-    no_items_title:"Inventory Empty",
-    no_items_sub:"Open some chests to find loot!",
-  },
-  ru: {
-    nav_chests:"Кейсы", nav_inv:"Сумка", nav_prof:"Профиль", nav_set:"Настройки",
-    choose_chest:"Выбери Кейс",
-    items:"Предметы", total_val:"Общая цена", sell_all:"Продать всё",
-    your_items:"Твои предметы", treasure_hunter:"Охотник за сокровищами",
-    chests_opened:"Открыто кейсов", total_sold:"Продано на",
-    referrals:"Рефералы", net_worth:"Капитал",
-    ref_program:"Реферальная программа",
-    ref_desc:"Приглашай друзей и получай золото за каждого нового игрока!",
-    gold_per_ref:"Золота за реферала", paid_instantly:"Начисляется сразу при входе",
-    your_link:"Твоя ссылка", share_link:"Поделиться ссылкой", your_refs:"Твои рефералы",
-    language:"🌐 Language / Язык", about:"⚔️ О игре", about_desc:"Фэнтезийная лут-игра",
-    open_slow:"Открыть медленно", open_fast:"Открыть быстро",
-    possible_drops:"Возможные предметы",
-    opening:"Открываем...", keep_it:"Оставить", sell_now:"Продать", worth:"Стоимость",
-    cancel:"Отмена",
-    not_enough:"❌ Недостаточно золота!",
-    added_inv:"🎒 Добавлено в инвентарь!",
-    sold_for:"💰 Продано за",
-    sold_all_for:"💰 Продано всё за",
+// ═══════════════════════════
+const TR = {
+  ru:{
+    nav_chests:"Кейсы",nav_inv:"Инвентарь",nav_profile:"Профиль",nav_settings:"Настройки",
+    choose:"Выбери кейс",items:"Предметы",tval:"Общая цена",sellall:"Продать всё",
+    youritems:"Твои предметы",hunter:"Охотник за сокровищами",
+    opened:"Открыто кейсов",sold:"Продано на",refs:"Рефералы",nw:"Капитал",
+    refprog:"Реферальная программа",
+    refdesc:"Приглашай друзей и получай золото за каждого нового игрока!",
+    perref:"золота за реферала",instant:"Начисляется сразу при входе",
+    yourlink:"Твоя ссылка",sharelink:"Поделиться ссылкой",yourrefs:"Твои рефералы",
+    about:"⚔️ О игре",aboutd:"Фэнтезийная лут-игра",
+    openslow:"Открыть медленно",openfast:"Открыть быстро",drops:"Возможные предметы",
+    opening:"Открываем...",keep:"В инвентарь",sell_r:"Продать",cancel:"Отмена",
+    worth:"Стоимость",
+    no_gold:"❌ Недостаточно золота!",
+    added:"🎒 Добавлено в инвентарь!",
+    sold_for:"💰 Продано за",sold_all:"💰 Продано всё за",
     inv_empty:"🎒 Инвентарь пуст!",
-    items_label:"предм.", value_label:"цена",
     link_copied:"🔗 Ссылка скопирована!",
-    no_referrals_title:"Рефералов пока нет",
-    no_referrals_sub:"Поделись ссылкой и зарабатывай 500🪙!",
-    no_items_title:"Инвентарь пуст",
-    no_items_sub:"Открой кейсы чтобы найти лут!",
+    no_refs_t:"Рефералов пока нет",no_refs_s:"Поделись ссылкой и зарабатывай 500🪙!",
+    no_items_t:"Инвентарь пуст",no_items_s:"Открой кейсы чтобы найти лут!",
+    logo_sub:"Фэнтезийная лут-игра",
+  },
+  en:{
+    nav_chests:"Chests",nav_inv:"Inventory",nav_profile:"Profile",nav_settings:"Settings",
+    choose:"Choose Your Chest",items:"Items",tval:"Total Value",sellall:"Sell Everything",
+    youritems:"Your Items",hunter:"Treasure Hunter",
+    opened:"Chests Opened",sold:"Total Sold",refs:"Referrals",nw:"Net Worth",
+    refprog:"Referral Program",
+    refdesc:"Invite friends and earn gold for each adventurer who joins!",
+    perref:"Gold per referral",instant:"Paid instantly when they join",
+    yourlink:"Your Link",sharelink:"Share Referral Link",yourrefs:"Your Referrals",
+    about:"⚔️ About",aboutd:"Fantasy loot game",
+    openslow:"Open Slowly",openfast:"Open Fast",drops:"Possible Drops",
+    opening:"Opening...",keep:"Keep It",sell_r:"Sell Now",cancel:"Cancel",
+    worth:"Worth",
+    no_gold:"❌ Not enough gold!",
+    added:"🎒 Added to inventory!",
+    sold_for:"💰 Sold for",sold_all:"💰 Sold everything for",
+    inv_empty:"🎒 Inventory is empty!",
+    link_copied:"🔗 Link copied!",
+    no_refs_t:"No Referrals Yet",no_refs_s:"Share your link to earn 500🪙!",
+    no_items_t:"Inventory Empty",no_items_s:"Open some chests to find loot!",
+    logo_sub:"Fantasy Loot Game",
   }
 };
-let LANG = localStorage.getItem("lang") || "en";
-function t(key) { return T[LANG][key] || T.en[key] || key; }
-function applyLang() {
-  document.querySelectorAll("[data-i]").forEach(el => {
-    const k = el.getAttribute("data-i");
-    el.textContent = t(k);
+let LANG = localStorage.getItem("lang")||"ru";
+const t = k => TR[LANG][k]||TR.en[k]||k;
+
+function applyLang(){
+  const m={
+    "nl-chests":"nav_chests","nl-inv":"nav_inv","nl-profile":"nav_profile","nl-settings":"nav_settings",
+    "t-choose":"choose","t-items":"items","t-tval":"tval","t-sellall":"sellall",
+    "t-youritems":"youritems","t-hunter":"hunter","t-opened":"opened","t-sold":"sold",
+    "t-refs":"refs","t-nw":"nw","t-refprog":"refprog","t-refdesc":"refdesc",
+    "t-perref":"perref","t-instant":"instant","t-yourlink":"yourlink","t-sharelink":"sharelink",
+    "t-yourrefs":"yourrefs","t-about":"about","t-aboutd":"aboutd",
+    "t-openslow":"openslow","t-openfast":"openfast","t-drops":"drops",
+    "spin-label":"opening","btn-keep":"keep","btn-sell-r":"sell_r","t-cancel":"cancel",
+    "logo-s":"logo_sub",
+  };
+  Object.entries(m).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el) el.textContent=t(key);
   });
-  document.getElementById("lang-en").classList.toggle("active", LANG==="en");
-  document.getElementById("lang-ru").classList.toggle("active", LANG==="ru");
-  // Re-render dynamic content
+  document.getElementById("lb-en").classList.toggle("on",LANG==="en");
+  document.getElementById("lb-ru").classList.toggle("on",LANG==="ru");
   renderChests();
-  if (document.getElementById("screen-inventory").classList.contains("active")) renderInventory();
-  if (document.getElementById("screen-profile").classList.contains("active"))   renderProfile();
+  if(document.getElementById("screen-inv").classList.contains("active")) renderInv();
+  if(document.getElementById("screen-profile").classList.contains("active")) renderProfile();
 }
-function setLang(l) {
-  LANG = l;
-  localStorage.setItem("lang", l);
-  applyLang();
-  showToast(l==="ru" ? "🌐 Русский язык включён" : "🌐 English language set");
+function setLang(l){
+  LANG=l; localStorage.setItem("lang",l); applyLang();
+  showToast(l==="ru"?"🌐 Русский язык включён":"🌐 English language set");
 }
 
-// ═══════════════════════════════════════════
-//  CHEST DATA
-// ═══════════════════════════════════════════
+// ═══════════════════════════
+//  DATA
+// ═══════════════════════════
 const CHESTS = [
-  { key:"wooden",  icon:"🪵", tier:"t1",
-    name:"Wooden Chest",
-    desc_en:"A battered old chest. Cheap thrills for the brave!",
-    desc_ru:"Потрёпанный старый сундук. Дёшево и сердито!",
-    cost:30,
-    badge_en:"⚪ Starter", badge_ru:"⚪ Стартовый",
-    badge_color:"rgba(150,150,150,.2)", badge_text:"#aaa",
-  },
-  { key:"bone",    icon:"🦴", tier:"t2",
-    name:"Bone Chest",
-    desc_en:"Crafted from ancient bones. Uncommon finds await!",
-    desc_ru:"Сделан из древних костей. Жди необычных находок!",
-    cost:60,
-    badge_en:"🟢 Uncommon", badge_ru:"🟢 Необычный",
-    badge_color:"rgba(46,204,113,.15)", badge_text:"#2ecc71",
-  },
-  { key:"silver",  icon:"🥈", tier:"t2",
-    name:"Silver Chest",
-    desc_en:"A polished silver chest. Better odds for rare loot.",
-    desc_ru:"Начищенный серебряный сундук. Больше шансов на редкий лут.",
-    cost:100,
-    badge_en:"🔵 Rare+", badge_ru:"🔵 Редкий+",
-    badge_color:"rgba(93,173,226,.15)", badge_text:"#5dade2",
-  },
-  { key:"shadow",  icon:"🌑", tier:"t4",
-    name:"Shadow Chest",
-    desc_en:"From the void. Epic and Legendary chances boosted!",
-    desc_ru:"Из пустоты. Повышенный шанс на Эпик и Легендарные!",
-    cost:200,
-    badge_en:"🟣 Epic+", badge_ru:"🟣 Эпик+",
-    badge_color:"rgba(142,68,173,.18)", badge_text:"#c39bd3",
-  },
-  { key:"dragon",  icon:"🐉", tier:"t5",
-    name:"Dragon Chest",
-    desc_en:"Forged in dragon fire. Legendary loot is close!",
-    desc_ru:"Выкован в огне дракона. Легендарный лут совсем близко!",
-    cost:500,
-    badge_en:"🔴 Legendary", badge_ru:"🔴 Легендарный",
-    badge_color:"rgba(231,76,60,.18)", badge_text:"#e74c3c",
-  },
-  { key:"golden",  icon:"✨", tier:"t6",
-    name:"Golden Chest",
-    desc_en:"The pinnacle of treasure. Legendary items guaranteed!*",
-    desc_ru:"Вершина сокровищ. Легендарные предметы практически гарантированы!*",
-    cost:1000,
-    badge_en:"🌟 Mythic", badge_ru:"🌟 Мифический",
-    badge_color:"rgba(255,215,0,.2)", badge_text:"#ffd700",
-  },
+  {key:"wooden",icon:"🪵",tier:"t1",cost:30,
+   name:"Wooden Chest",
+   desc_ru:"Потрёпанный деревянный сундук. Дёшево и сердито!",
+   desc_en:"A battered chest. Cheap thrills for the brave!",
+   badge_ru:"⚪ Стартовый",badge_en:"⚪ Starter",
+   bc:"rgba(150,150,150,.18)",bt:"#aaa"},
+  {key:"bone",icon:"🦴",tier:"t2",cost:60,
+   name:"Bone Chest",
+   desc_ru:"Сделан из древних костей. Жди необычных находок!",
+   desc_en:"Crafted from ancient bones. Uncommon finds await!",
+   badge_ru:"🟢 Необычный",badge_en:"🟢 Uncommon",
+   bc:"rgba(46,204,113,.18)",bt:"#2ecc71"},
+  {key:"silver",icon:"🥈",tier:"t3",cost:100,
+   name:"Silver Chest",
+   desc_ru:"Начищенный серебряный сундук. Больше шансов на редкий лут.",
+   desc_en:"A polished silver chest. Better odds for rare loot.",
+   badge_ru:"🔵 Редкий+",badge_en:"🔵 Rare+",
+   bc:"rgba(93,173,226,.18)",bt:"#5dade2"},
+  {key:"shadow",icon:"🌑",tier:"t4",cost:200,
+   name:"Shadow Chest",
+   desc_ru:"Из пустоты. Повышенный шанс на Эпик и Легендарные!",
+   desc_en:"From the void. Epic and Legendary chances boosted!",
+   badge_ru:"🟣 Эпик+",badge_en:"🟣 Epic+",
+   bc:"rgba(195,155,211,.18)",bt:"#c39bd3"},
+  {key:"dragon",icon:"🐉",tier:"t5",cost:500,
+   name:"Dragon Chest",
+   desc_ru:"Выкован в огне дракона. Легендарный лут совсем близко!",
+   desc_en:"Forged in dragon fire. Legendary loot is close!",
+   badge_ru:"🔴 Легендарный",badge_en:"🔴 Legendary",
+   bc:"rgba(231,76,60,.18)",bt:"#e74c3c"},
+  {key:"golden",icon:"✨",tier:"t6",cost:1000,
+   name:"Golden Chest",
+   desc_ru:"Вершина сокровищ. Легендарные предметы практически гарантированы!",
+   desc_en:"The pinnacle of treasure. Legendary almost guaranteed!",
+   badge_ru:"🌟 Мифический",badge_en:"🌟 Mythic",
+   bc:"rgba(255,215,0,.22)",bt:"#ffd700"},
 ];
 
-// Chest odds per tier (rarity weights: Common/Uncommon/Rare/Epic/Legendary)
 const CHEST_ODDS = {
-  wooden: [50,30,15,4,1],
-  bone:   [30,40,22,6,2],
-  silver: [20,30,32,12,6],
-  shadow: [10,20,30,28,12],
-  dragon: [5,10,20,30,35],
-  golden: [0,5,10,25,60],
+  wooden:[50,30,15,4,1],
+  bone:  [30,40,22,6,2],
+  silver:[20,30,32,12,6],
+  shadow:[10,20,30,28,12],
+  dragon:[5,10,20,30,35],
+  golden:[0,5,10,25,60],
 };
 
-// ═══════════════════════════════════════════
-//  ITEMS DATA
-// ═══════════════════════════════════════════
 const ITEMS = {
-  health_potion:   {name:"Health Potion",   emoji:"🧪", rarity:"Common",    value:10},
-  wooden_sword:    {name:"Wooden Sword",    emoji:"🗡️",  rarity:"Common",    value:15},
-  leather_boots:   {name:"Leather Boots",   emoji:"👢", rarity:"Common",    value:12},
-  bread_loaf:      {name:"Bread Loaf",      emoji:"🍞", rarity:"Common",    value:5},
-  iron_shield:     {name:"Iron Shield",     emoji:"🛡️",  rarity:"Common",    value:20},
-  mana_potion:     {name:"Mana Potion",     emoji:"💙", rarity:"Uncommon",  value:35},
-  silver_dagger:   {name:"Silver Dagger",   emoji:"🔪", rarity:"Uncommon",  value:50},
-  chain_armor:     {name:"Chain Armor",     emoji:"⛓️",  rarity:"Uncommon",  value:60},
-  magic_scroll:    {name:"Magic Scroll",    emoji:"📜", rarity:"Uncommon",  value:45},
-  enchanted_ring:  {name:"Enchanted Ring",  emoji:"💍", rarity:"Uncommon",  value:55},
-  elven_bow:       {name:"Elven Bow",       emoji:"🏹", rarity:"Rare",      value:150},
-  fire_staff:      {name:"Fire Staff",      emoji:"🔥", rarity:"Rare",      value:180},
-  dragon_scale:    {name:"Dragon Scale",    emoji:"🐉", rarity:"Rare",      value:200},
-  crystal_amulet:  {name:"Crystal Amulet",  emoji:"🔮", rarity:"Rare",      value:160},
-  thunder_axe:     {name:"Thunder Axe",     emoji:"⚡", rarity:"Epic",      value:500},
-  void_cloak:      {name:"Void Cloak",      emoji:"🌑", rarity:"Epic",      value:550},
-  phoenix_feather: {name:"Phoenix Feather", emoji:"🦅", rarity:"Epic",      value:480},
-  excalibur:       {name:"Excalibur",       emoji:"⚔️",  rarity:"Legendary", value:2000},
-  crown_of_gods:   {name:"Crown of Gods",   emoji:"👑", rarity:"Legendary", value:2500},
-  chaos_orb:       {name:"Chaos Orb",       emoji:"🌀", rarity:"Legendary", value:1800},
+  health_potion:  {name:"Health Potion",  emoji:"🧪",rarity:"Common",   value:10},
+  wooden_sword:   {name:"Wooden Sword",   emoji:"🗡️", rarity:"Common",   value:15},
+  leather_boots:  {name:"Leather Boots",  emoji:"👢",rarity:"Common",   value:12},
+  bread_loaf:     {name:"Bread Loaf",     emoji:"🍞",rarity:"Common",   value:5},
+  iron_shield:    {name:"Iron Shield",    emoji:"🛡️", rarity:"Common",   value:20},
+  mana_potion:    {name:"Mana Potion",    emoji:"💙",rarity:"Uncommon", value:35},
+  silver_dagger:  {name:"Silver Dagger",  emoji:"🔪",rarity:"Uncommon", value:50},
+  chain_armor:    {name:"Chain Armor",    emoji:"⛓️", rarity:"Uncommon", value:60},
+  magic_scroll:   {name:"Magic Scroll",   emoji:"📜",rarity:"Uncommon", value:45},
+  enchanted_ring: {name:"Enchanted Ring", emoji:"💍",rarity:"Uncommon", value:55},
+  elven_bow:      {name:"Elven Bow",      emoji:"🏹",rarity:"Rare",     value:150},
+  fire_staff:     {name:"Fire Staff",     emoji:"🔥",rarity:"Rare",     value:180},
+  dragon_scale:   {name:"Dragon Scale",   emoji:"🐉",rarity:"Rare",     value:200},
+  crystal_amulet: {name:"Crystal Amulet", emoji:"🔮",rarity:"Rare",     value:160},
+  thunder_axe:    {name:"Thunder Axe",    emoji:"⚡",rarity:"Epic",     value:500},
+  void_cloak:     {name:"Void Cloak",     emoji:"🌑",rarity:"Epic",     value:550},
+  phoenix_feather:{name:"Phoenix Feather",emoji:"🦅",rarity:"Epic",     value:480},
+  excalibur:      {name:"Excalibur",      emoji:"⚔️", rarity:"Legendary",value:2000},
+  crown_of_gods:  {name:"Crown of Gods",  emoji:"👑",rarity:"Legendary",value:2500},
+  chaos_orb:      {name:"Chaos Orb",      emoji:"🌀",rarity:"Legendary",value:1800},
 };
-const ITEM_KEYS    = Object.keys(ITEMS);
-const RARITY_ORDER = ["Common","Uncommon","Rare","Epic","Legendary"];
+const IKEYS = Object.keys(ITEMS);
+const RORD  = ["Common","Uncommon","Rare","Epic","Legendary"];
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 //  STATE
-// ═══════════════════════════════════════════
-let state = {gold:0,inventory:{},chests_opened:0,total_earned:0,referrals:[],first_name:"Adventurer"};
+// ═══════════════════════════
+let S = {gold:0,inventory:{},chests_opened:0,total_earned:0,referrals:[],first_name:""};
 let pendingItem  = null;
 let modalItem    = null;
-let isSpinning   = false;
-let currentChest = null;
+let spinning     = false;
+let curChest     = null;
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 //  TELEGRAM
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 const tg = window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 const initData = tg?.initData||"";
-function apiHeaders(){
+function apiH(){
   const h={"Content-Type":"application/json"};
   if(initData) h["X-Telegram-Init-Data"]=initData;
   else if(tg?.initDataUnsafe?.user?.id) h["X-User-Id"]=String(tg.initDataUnsafe.user.id);
   return h;
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 //  API
-// ═══════════════════════════════════════════
-async function apiFetch(path, opts={}){
-  try{
-    const r=await fetch(API_BASE+path,{headers:apiHeaders(),...opts});
-    if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||"Error");}
-    return await r.json();
-  }catch(e){ showToast("❌ "+e.message); throw e; }
+// ═══════════════════════════
+async function api(path,opts={}){
+  const r=await fetch(API_BASE+path,{headers:apiH(),...opts});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.detail||"Error");}
+  return r.json();
 }
 async function loadPlayer(){
-  const d=await apiFetch("/api/player");
-  state={...state,...d}; updateGold();
+  const d=await api("/api/player");
+  S={...S,...d}; updateGold();
 }
 
-// ═══════════════════════════════════════════
-//  BACKGROUND CANVAS
-// ═══════════════════════════════════════════
-(function(){
-  const c=document.getElementById("bg-canvas");
-  const ctx=c.getContext("2d");
-  const stars=[];
-  function resize(){ c.width=innerWidth; c.height=innerHeight; }
-  resize(); window.addEventListener("resize",resize);
-  for(let i=0;i<120;i++) stars.push({
-    x:Math.random(),y:Math.random(),
-    r:Math.random()*1.2+.3,
-    a:Math.random(),da:(Math.random()-.5)*.008,
-  });
-  function draw(){
+// ═══════════════════════════
+//  BG CANVAS
+// ═══════════════════════════
+(()=>{
+  const c=document.getElementById("bgc"),ctx=c.getContext("2d"),stars=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;}
+  resize();window.addEventListener("resize",resize);
+  for(let i=0;i<100;i++) stars.push({x:Math.random(),y:Math.random(),
+    r:Math.random()*1.2+.3,a:Math.random(),da:(Math.random()-.5)*.007});
+  (function draw(){
     ctx.clearRect(0,0,c.width,c.height);
     stars.forEach(s=>{
       s.a=Math.max(.1,Math.min(1,s.a+s.da));
-      if(s.a<=.1||s.a>=1) s.da*=-1;
-      ctx.globalAlpha=s.a*.7;
-      ctx.fillStyle="#f0d878";
-      ctx.beginPath();
-      ctx.arc(s.x*c.width,s.y*c.height,s.r,0,Math.PI*2);
-      ctx.fill();
+      if(s.a<=.1||s.a>=1)s.da*=-1;
+      ctx.globalAlpha=s.a*.65;ctx.fillStyle="#f0d878";
+      ctx.beginPath();ctx.arc(s.x*c.width,s.y*c.height,s.r,0,Math.PI*2);ctx.fill();
     });
-    ctx.globalAlpha=1;
-    requestAnimationFrame(draw);
-  }
-  draw();
+    ctx.globalAlpha=1;requestAnimationFrame(draw);
+  })();
 })();
 
-// ═══════════════════════════════════════════
-//  CHEST LIST RENDER
-// ═══════════════════════════════════════════
+// ═══════════════════════════
+//  CHEST LIST
+// ═══════════════════════════
 function renderChests(){
-  const grid=document.getElementById("chests-grid");
-  grid.innerHTML=CHESTS.map(ch=>{
-    const badge = LANG==="ru" ? ch.badge_ru : ch.badge_en;
-    const desc  = LANG==="ru" ? ch.desc_ru  : ch.desc_en;
-    const canOpen = state.gold >= ch.cost;
-    return `<div class="chest-card ${ch.tier}${canOpen?"":" locked"}" onclick="openDetail('${ch.key}')">
+  const g=document.getElementById("chests-grid");
+  g.innerHTML=CHESTS.map(ch=>{
+    const badge=LANG==="ru"?ch.badge_ru:ch.badge_en;
+    const desc =LANG==="ru"?ch.desc_ru:ch.desc_en;
+    const can  =S.gold>=ch.cost;
+    return `<div class="chest-card ${ch.tier}${can?"":" locked"}" onclick="openDetail('${ch.key}')">
       <div class="chest-art">${ch.icon}</div>
       <div class="chest-info">
         <div class="chest-name">${ch.name}</div>
-        <div class="chest-tier-badge" style="background:${ch.badge_color};color:${ch.badge_text};border:1px solid ${ch.badge_text}44">${badge}</div>
+        <div class="chest-tier" style="background:${ch.bc};color:${ch.bt};border:1px solid ${ch.bt}44">${badge}</div>
         <div class="chest-desc">${desc}</div>
         <div class="chest-cost-row">
           <span class="chest-cost-num">${ch.cost}</span>
@@ -857,223 +743,234 @@ function renderChests(){
   }).join("");
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 //  CHEST DETAIL
-// ═══════════════════════════════════════════
-function openDetail(chestKey){
-  currentChest = CHESTS.find(c=>c.key===chestKey);
-  if(!currentChest) return;
+// ═══════════════════════════
+function openDetail(key){
+  curChest=CHESTS.find(c=>c.key===key);
+  if(!curChest)return;
+  document.getElementById("det-title").textContent=curChest.name;
+  document.getElementById("det-icon").textContent=curChest.icon;
+  document.getElementById("det-name").textContent=curChest.name;
+  document.getElementById("det-desc").textContent=LANG==="ru"?curChest.desc_ru:curChest.desc_en;
+  document.getElementById("cost-slow").textContent=curChest.cost+" 🪙";
+  document.getElementById("cost-fast").textContent=curChest.cost+" 🪙";
+  document.getElementById("t-openslow").textContent=t("openslow");
+  document.getElementById("t-openfast").textContent=t("openfast");
 
-  document.getElementById("detail-title").textContent = currentChest.name;
-  document.getElementById("detail-chest-img").textContent = currentChest.icon;
-  document.getElementById("detail-chest-name").textContent = currentChest.name;
-  document.getElementById("detail-chest-desc").textContent =
-    LANG==="ru" ? currentChest.desc_ru : currentChest.desc_en;
-  document.getElementById("btn-cost-slow").textContent = `${currentChest.cost} 🪙`;
-  document.getElementById("btn-cost-fast").textContent = `${currentChest.cost} 🪙`;
-
-  // Build drop table
-  const odds = CHEST_ODDS[chestKey];
-  const totalWeight = odds.reduce((a,b)=>a+b,0);
-  const dropEl = document.getElementById("drop-table");
-
-  // Group items by rarity
-  const byRarity = {};
-  ITEM_KEYS.forEach(k=>{ const r=ITEMS[k].rarity; if(!byRarity[r]) byRarity[r]=[]; byRarity[r].push(k); });
-
+  // build drop table
+  const odds=CHEST_ODDS[key];
+  const total=odds.reduce((a,b)=>a+b,0);
+  const byRar={};
+  IKEYS.forEach(k=>{const r=ITEMS[k].rarity;(byRar[r]=byRar[r]||[]).push(k);});
   let html="";
-  RARITY_ORDER.forEach((rarity,ri)=>{
-    if(!byRarity[rarity]||odds[ri]===0) return;
-    const rarityChance = odds[ri];
-    const itemsInRarity = byRarity[rarity].length;
-    byRarity[rarity].forEach(key=>{
-      const item = ITEMS[key];
-      const chance = (rarityChance / itemsInRarity / totalWeight * 100).toFixed(1);
+  RORD.forEach((rar,ri)=>{
+    if(!byRar[rar]||!odds[ri])return;
+    byRar[rar].forEach(k=>{
+      const it=ITEMS[k];
+      const pct=(odds[ri]/byRar[rar].length/total*100).toFixed(1);
       html+=`<div class="drop-row">
-        <div class="drop-emoji">${item.emoji}</div>
+        <div class="drop-em">${it.emoji}</div>
         <div class="drop-info">
-          <div class="drop-name ${rarity}">${item.name}</div>
-          <div class="drop-val">${item.value}🪙 · ${rarity}</div>
+          <div class="drop-name ${rar}">${it.name}</div>
+          <div class="drop-sub">${it.value}🪙 · ${rar}</div>
         </div>
-        <div class="drop-chance ${rarity}">${chance}%</div>
+        <div class="drop-pct ${rar}">${pct}%</div>
       </div>`;
     });
   });
-  dropEl.innerHTML = html;
-
-  document.getElementById("chest-detail").classList.add("open");
-  if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+  document.getElementById("drop-table").innerHTML=html;
+  document.getElementById("detail").classList.add("open");
+  if(tg?.HapticFeedback)tg.HapticFeedback.impactOccurred("light");
 }
-
 function closeDetail(){
-  document.getElementById("chest-detail").classList.remove("open");
-  currentChest=null;
+  document.getElementById("detail").classList.remove("open");
+  curChest=null;
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 //  OPEN CHEST
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 async function doOpen(fast){
-  if(!currentChest||isSpinning) return;
-  if(state.gold<currentChest.cost){ showToast(t("not_enough")); return; }
+  if(!curChest||spinning)return;
+  if(S.gold<curChest.cost){showToast(t("no_gold"));return;}
 
-  isSpinning=true;
+  spinning=true;
+  // Блокируем кнопки
+  document.getElementById("obtn-slow").disabled=true;
+  document.getElementById("obtn-fast").disabled=true;
+
+  // Запоминаем сундук и закрываем детали
+  const chest=curChest;
   closeDetail();
 
-  // Show spin screen
-  const ss=document.getElementById("spin-screen");
+  // Показываем оверлей
+  const ov=document.getElementById("spin-overlay");
   document.getElementById("spin-result").classList.remove("show");
-  document.getElementById("spin-chest").textContent=currentChest.icon;
-  document.getElementById("spin-chest").className="spin-chest-anim"+(fast?" fast-mode":"");
-  document.getElementById("spin-status").textContent=t("opening");
-  ss.classList.add("visible");
+  document.getElementById("spin-result").style.pointerEvents="none";
+  const sc=document.getElementById("spin-chest");
+  sc.textContent=chest.icon;
+  sc.className="spin-chest shake"+(fast?" fast":"");
+  document.getElementById("spin-label").textContent=t("opening");
+  ov.classList.add("on");
 
   try{
-    const result=await apiFetch("/api/open_chest",{
+    // Запрос к серверу
+    const result=await api("/api/open_chest",{
       method:"POST",
-      body:JSON.stringify({chest_type:currentChest.key}),
+      body:JSON.stringify({chest_type:chest.key}),
     });
-    state.gold=result.gold;
-    state.inventory[result.item_key]=(state.inventory[result.item_key]||0)+1;
+
+    S.gold=result.gold;
+    S.inventory[result.item_key]=(S.inventory[result.item_key]||0)+1;
     pendingItem=result.item_key;
     updateGold();
 
-    // Run spin animation
-    const duration = fast ? 1800 : 4500;
-    await runSpin(result.item_key, duration);
+    // Запуск анимации прокрутки
+    const dur=fast?1600:4200;
+    await runReel(result.item_key,dur);
 
   }catch(e){
-    ss.classList.remove("visible");
-    isSpinning=false;
+    // Ошибка — закрываем оверлей
+    ov.classList.remove("on");
+    spinning=false;
+    document.getElementById("obtn-slow").disabled=false;
+    document.getElementById("obtn-fast").disabled=false;
+    showToast("❌ "+e.message);
   }
 }
 
-// ═══════════════════════════════════════════
-//  SPIN ANIMATION
-// ═══════════════════════════════════════════
-const ITEM_W = 105; // item width + gap
+// ═══════════════════════════
+//  REEL ANIMATION
+// ═══════════════════════════
+const IW=105; // ширина item + gap
 
-function buildReel(winnerKey){
+function buildReel(winKey){
   const track=document.getElementById("reel-track");
   track.innerHTML="";
-  const total=60, winPos=45;
-  const arr=[];
-  for(let i=0;i<total;i++) arr.push(i===winPos ? winnerKey : randomReelItem());
-  arr.forEach((key,i)=>{
+  const total=60,winPos=46;
+  for(let i=0;i<total;i++){
+    const key=i===winPos?winKey:randItem();
     const item=ITEMS[key];
     const el=document.createElement("div");
-    el.className=`reel-item ${item.rarity}`;
-    if(i===winPos) el.id="reel-winner";
-    el.innerHTML=`<div class="ri-emoji">${item.emoji}</div>
-      <div class="ri-name">${item.name}</div>
-      <div class="ri-rarity ${item.rarity}">${item.rarity}</div>`;
+    el.className=`ri ${item.rarity}`;
+    if(i===winPos)el.id="reel-winner";
+    el.innerHTML=`<div class="ri-em">${item.emoji}</div>
+      <div class="ri-nm">${item.name}</div>
+      <div class="ri-rar ${item.rarity}">${item.rarity}</div>`;
     track.appendChild(el);
-  });
+  }
   return winPos;
 }
 
-function randomReelItem(){
-  // Weighted pool biased towards commons for visual variety
+function randItem(){
   const w={Common:50,Uncommon:30,Rare:15,Epic:4,Legendary:1};
   const pool=[];
-  ITEM_KEYS.forEach(k=>{ for(let i=0;i<(w[ITEMS[k].rarity]||1);i++) pool.push(k); });
+  IKEYS.forEach(k=>{for(let i=0;i<(w[ITEMS[k].rarity]||1);i++)pool.push(k);});
   return pool[Math.floor(Math.random()*pool.length)];
 }
 
-function runSpin(winnerKey, duration){
+function runReel(winKey,dur){
   return new Promise(resolve=>{
     const track=document.getElementById("reel-track");
+    // Сброс позиции
     track.style.transition="none";
     track.style.transform="translateX(200px)";
 
     const ww=document.querySelector(".reel-wrap").offsetWidth;
-    const center=ww/2;
-    const winPos=buildReel(winnerKey);
-    const targetX=-(winPos*ITEM_W)+center-ITEM_W/2;
-    const jitter=(Math.random()-.5)*20;
+    const winPos=buildReel(winKey);
+    const targetX=-(winPos*IW)+(ww/2)-(IW/2);
+    const jitter=(Math.random()-.5)*18;
     const finalX=targetX+jitter;
     const startX=200;
-    const start=performance.now();
-
-    // Easing: quartic out
-    function ease(t){ return 1-Math.pow(1-t,4); }
-
+    const t0=performance.now();
     let hapticDone=false;
-    function step(now){
-      const elapsed=now-start;
-      const pct=Math.min(elapsed/duration,1);
-      const ex=ease(pct);
-      track.style.transform=`translateX(${startX+(finalX-startX)*ex}px)`;
 
-      // Haptic feedback when slowing down
-      if(pct>0.72&&!hapticDone){
+    function ease(p){return 1-Math.pow(1-p,4);}
+
+    function step(now){
+      const p=Math.min((now-t0)/dur,1);
+      const ep=ease(p);
+      track.style.transform=`translateX(${startX+(finalX-startX)*ep}px)`;
+
+      if(p>0.73&&!hapticDone){
         hapticDone=true;
-        if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
+        if(tg?.HapticFeedback)tg.HapticFeedback.impactOccurred("medium");
       }
 
-      if(pct<1){ requestAnimationFrame(step); }
+      if(p<1){requestAnimationFrame(step);}
       else{
-        // Snap to exact center
         track.style.transform=`translateX(${targetX}px)`;
-        const winner=document.getElementById("reel-winner");
-        if(winner) winner.classList.add("is-winner");
-        setTimeout(()=>{ showSpinResult(ITEMS[winnerKey]); resolve(); }, 350);
+        const w=document.getElementById("reel-winner");
+        if(w)w.classList.add("winner");
+        setTimeout(()=>showResult(ITEMS[winKey]),400);
+        resolve();
       }
     }
-    requestAnimationFrame(step);
+    // Небольшая задержка чтобы DOM обновился
+    requestAnimationFrame(()=>requestAnimationFrame(step));
   });
 }
 
-function showSpinResult(item){
+function showResult(item){
+  // Стоп анимация сундука
+  document.getElementById("spin-chest").className="spin-chest";
+  document.getElementById("spin-label").style.display="none";
+
+  // Хаптик
   if(tg?.HapticFeedback){
-    const hap={Common:"light",Uncommon:"medium",Rare:"medium",Epic:"heavy",Legendary:"heavy"};
-    tg.HapticFeedback.impactOccurred(hap[item.rarity]||"light");
-    if(item.rarity==="Legendary") setTimeout(()=>tg.HapticFeedback.notificationOccurred("success"),200);
+    const h={Common:"light",Uncommon:"medium",Rare:"medium",Epic:"heavy",Legendary:"heavy"};
+    tg.HapticFeedback.impactOccurred(h[item.rarity]||"light");
+    if(item.rarity==="Legendary")setTimeout(()=>tg.HapticFeedback.notificationOccurred("success"),200);
   }
-  if(["Epic","Legendary"].includes(item.rarity)) spawnParticles(item.rarity);
 
-  document.getElementById("res-badge").textContent = item.rarity;
-  document.getElementById("res-badge").className   = "res-badge "+item.rarity;
-  document.getElementById("res-name").textContent  = item.name;
-  document.getElementById("res-name").className    = "res-name "+item.rarity;
-  document.getElementById("res-val").textContent   = item.value;
+  // Частицы
+  if(["Epic","Legendary"].includes(item.rarity))spawnPts(item.rarity);
 
-  // Update worth label
-  const worthEl = document.querySelector("#spin-result .res-val [data-i='worth']");
-  if(worthEl) worthEl.textContent=t("worth");
-  document.querySelector(".btn-keep").textContent=t("keep_it");
-  document.querySelector(".btn-sell-now").textContent=t("sell_now");
+  // Заполняем результат
+  document.getElementById("res-badge").textContent=item.rarity;
+  document.getElementById("res-badge").className="res-badge "+item.rarity;
+  document.getElementById("res-name").textContent=item.name;
+  document.getElementById("res-name").className="res-name "+item.rarity;
+  document.getElementById("res-val").textContent=item.value;
+  document.getElementById("btn-keep").textContent=t("keep");
+  document.getElementById("btn-sell-r").textContent=t("sell_r");
 
-  document.getElementById("spin-result").classList.add("show");
-  document.getElementById("spin-status").style.display="none";
+  const rv=document.getElementById("spin-result");
+  rv.style.pointerEvents="all";
+  rv.classList.add("show");
 }
 
 function keepItem(){
-  document.getElementById("spin-screen").classList.remove("visible");
-  document.getElementById("spin-status").style.display="";
-  document.getElementById("particles").innerHTML="";
-  pendingItem=null; isSpinning=false;
-  showToast(t("added_inv"));
+  document.getElementById("spin-overlay").classList.remove("on");
+  document.getElementById("spin-label").style.display="";
+  document.getElementById("pts").innerHTML="";
+  pendingItem=null; spinning=false;
+  document.getElementById("obtn-slow").disabled=false;
+  document.getElementById("obtn-fast").disabled=false;
+  showToast(t("added"));
 }
 
 async function sellNow(){
-  if(!pendingItem) return;
+  if(!pendingItem)return;
   try{
-    const d=await apiFetch("/api/sell",{method:"POST",body:JSON.stringify({item_key:pendingItem,quantity:1})});
-    state.gold=d.gold;
-    state.inventory[pendingItem]=(state.inventory[pendingItem]||1)-1;
-    if(state.inventory[pendingItem]<=0) delete state.inventory[pendingItem];
+    const d=await api("/api/sell",{method:"POST",body:JSON.stringify({item_key:pendingItem,quantity:1})});
+    S.gold=d.gold;
+    S.inventory[pendingItem]=(S.inventory[pendingItem]||1)-1;
+    if(S.inventory[pendingItem]<=0)delete S.inventory[pendingItem];
     updateGold();
     showToast(`${t("sold_for")} ${d.earnings}🪙!`);
   }catch(e){}
-  document.getElementById("spin-screen").classList.remove("visible");
-  document.getElementById("spin-status").style.display="";
-  document.getElementById("particles").innerHTML="";
-  pendingItem=null; isSpinning=false;
+  document.getElementById("spin-overlay").classList.remove("on");
+  document.getElementById("spin-label").style.display="";
+  document.getElementById("pts").innerHTML="";
+  pendingItem=null; spinning=false;
+  document.getElementById("obtn-slow").disabled=false;
+  document.getElementById("obtn-fast").disabled=false;
 }
 
-function spawnParticles(rarity){
-  const pc=document.getElementById("particles");
+function spawnPts(rarity){
+  const pc=document.getElementById("pts");
   pc.innerHTML="";
   const col={Epic:"#c39bd3",Legendary:"#f0c040"}[rarity];
   const n=rarity==="Legendary"?55:25;
@@ -1090,125 +987,126 @@ function spawnParticles(rarity){
   setTimeout(()=>pc.innerHTML="",2800);
 }
 
-// ═══════════════════════════════════════════
-//  UI HELPERS
-// ═══════════════════════════════════════════
+// ═══════════════════════════
+//  UI
+// ═══════════════════════════
 function updateGold(){
-  const el=document.getElementById("gold-display");
-  el.style.transform="scale(1.18)"; el.style.color="#fff";
-  el.textContent=state.gold;
+  const el=document.getElementById("gold-disp");
+  el.style.transform="scale(1.18)";el.style.color="#fff";
+  el.textContent=S.gold;
   setTimeout(()=>{el.style.transform="";el.style.color=""},320);
-  renderChests(); // update locked state
+  renderChests();
 }
 
-function showScreen(name){
+function showScr(name){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".nb").forEach(b=>b.classList.remove("active"));
   document.getElementById("screen-"+name).classList.add("active");
   document.getElementById("nav-"+name).classList.add("active");
-  if(name==="inventory") renderInventory();
-  if(name==="profile")   renderProfile();
+  if(name==="inv")     renderInv();
+  if(name==="profile") renderProfile();
 }
 
-function renderInventory(){
-  const items=Object.entries(state.inventory).filter(([,v])=>v>0);
-  const count=items.reduce((a,[,v])=>a+v,0);
-  const value=items.reduce((a,[k,v])=>a+(ITEMS[k]?.value||0)*v,0);
-  document.getElementById("inv-count").textContent=count;
-  document.getElementById("inv-value").textContent=value+"🪙";
-  const sorted=[...items].sort((a,b)=>RARITY_ORDER.indexOf(ITEMS[b[0]]?.rarity)-RARITY_ORDER.indexOf(ITEMS[a[0]]?.rarity));
+function renderInv(){
+  const items=Object.entries(S.inventory).filter(([,v])=>v>0);
+  const cnt=items.reduce((a,[,v])=>a+v,0);
+  const val=items.reduce((a,[k,v])=>a+(ITEMS[k]?.value||0)*v,0);
+  document.getElementById("inv-count").textContent=cnt;
+  document.getElementById("inv-val").textContent=val+"🪙";
+  const sorted=[...items].sort((a,b)=>RORD.indexOf(ITEMS[b[0]]?.rarity)-RORD.indexOf(ITEMS[a[0]]?.rarity));
   const list=document.getElementById("inv-list");
   if(!sorted.length){
-    list.innerHTML=`<div class="empty-state"><div class="es-icon">🎒</div>
-      <div class="es-txt">${t("no_items_title")}</div>
-      <div class="es-sub">${t("no_items_sub")}</div></div>`;
+    list.innerHTML=`<div class="empty"><div class="empty-ic">🎒</div>
+      <div class="empty-t">${t("no_items_t")}</div>
+      <div class="empty-s">${t("no_items_s")}</div></div>`;
     return;
   }
+  const rc={Legendary:"rL",Epic:"rE",Rare:"rR"};
   list.innerHTML=sorted.map(([key,cnt])=>{
-    const item=ITEMS[key]||{};
-    return `<div class="inv-item rarity-${item.rarity}" onclick="openSellModal('${key}')">
-      <div class="ii-emoji">${item.emoji||"📦"}</div>
+    const it=ITEMS[key]||{};
+    return `<div class="inv-item ${rc[it.rarity]||""}" onclick="openSellModal('${key}')">
+      <div class="ii-em">${it.emoji||"📦"}</div>
       <div class="ii-info">
-        <div class="ii-name">${item.name||key}</div>
-        <div class="ii-rarity ${item.rarity}">⬥ ${item.rarity}</div>
+        <div class="ii-name">${it.name||key}</div>
+        <div class="ii-rar ${it.rarity}">⬥ ${it.rarity}</div>
       </div>
       <div class="ii-right">
-        <div class="ii-count">×${cnt}</div>
-        <div class="ii-val">${(item.value||0)*cnt}🪙</div>
+        <div class="ii-cnt">×${cnt}</div>
+        <div class="ii-val">${(it.value||0)*cnt}🪙</div>
       </div>
     </div>`;
   }).join("");
 }
 
 function renderProfile(){
-  document.getElementById("profile-name").textContent=state.first_name||"Adventurer";
-  document.getElementById("stat-chests").textContent=state.chests_opened;
-  document.getElementById("stat-earned").textContent=state.total_earned+"🪙";
-  document.getElementById("stat-refs").textContent=state.referrals.length;
-  const invVal=Object.entries(state.inventory).reduce((a,[k,v])=>a+(ITEMS[k]?.value||0)*v,0);
-  document.getElementById("stat-nw").textContent=(state.gold+invVal)+"🪙";
+  document.getElementById("prof-name").textContent=S.first_name||"Авантюрист";
+  document.getElementById("s-chests").textContent=S.chests_opened;
+  document.getElementById("s-earned").textContent=S.total_earned+"🪙";
+  document.getElementById("s-refs").textContent=S.referrals.length;
+  const iv=Object.entries(S.inventory).reduce((a,[k,v])=>a+(ITEMS[k]?.value||0)*v,0);
+  document.getElementById("s-nw").textContent=(S.gold+iv)+"🪙";
   const uid=tg?.initDataUnsafe?.user?.id||"demo";
   document.getElementById("ref-link-box").textContent=`https://t.me/${BOT_USERNAME}?start=ref_${uid}`;
   const rl=document.getElementById("ref-list");
-  if(!state.referrals.length){
-    rl.innerHTML=`<div class="empty-state"><div class="es-icon">👥</div>
-      <div class="es-txt">${t("no_referrals_title")}</div>
-      <div class="es-sub">${t("no_referrals_sub")}</div></div>`;
-  } else {
-    rl.innerHTML=state.referrals.map(r=>`
-      <div class="ref-person">
-        <span style="font-size:22px">👤</span>
-        <span class="rp-name">${r.name}</span>
-        <span class="rp-ts">${r.ts}</span>
-        <span class="rp-gold">+500🪙</span>
-      </div>`).join("");
+  if(!S.referrals.length){
+    rl.innerHTML=`<div class="empty"><div class="empty-ic">👥</div>
+      <div class="empty-t">${t("no_refs_t")}</div>
+      <div class="empty-s">${t("no_refs_s")}</div></div>`;
+  }else{
+    rl.innerHTML=S.referrals.map(r=>`<div class="ref-pers">
+      <span style="font-size:22px">👤</span>
+      <span class="rp-nm">${r.name}</span>
+      <span class="rp-ts">${r.ts}</span>
+      <span class="rp-g">+500🪙</span>
+    </div>`).join("");
   }
 }
 
 // SELL MODAL
 function openSellModal(key){
   modalItem=key;
-  const item=ITEMS[key]; const count=state.inventory[key]||0;
-  document.getElementById("modal-em").textContent=item.emoji;
-  document.getElementById("modal-nm").textContent=item.name;
-  document.getElementById("modal-sb").textContent=`${item.rarity} · ${item.value}🪙 each`;
+  const it=ITEMS[key],cnt=S.inventory[key]||0;
+  document.getElementById("modal-em").textContent=it.emoji;
+  document.getElementById("modal-nm").textContent=it.name;
+  document.getElementById("modal-sb").textContent=`${it.rarity} · ${it.value}🪙 each`;
   let html="";
   const opt=(lbl,qty,gold,cls="")=>
-    html+=`<div class="sell-opt ${cls}" onclick="execSell(${qty})">
-      <div class="so-count">${lbl}</div><div class="so-gold">${gold}🪙</div></div>`;
-  opt("×1",1,item.value);
-  if(count>=5)  opt("×5",5,item.value*5);
-  if(count>=10) opt("×10",10,item.value*10);
-  if(count>1)   opt(`${t("sell_all")} (×${count})`,-1,item.value*count,"sell-opt-all");
+    html+=`<div class="sopt ${cls}" onclick="execSell(${qty})">
+      <div class="sopt-cnt">${lbl}</div><div class="sopt-g">${gold}🪙</div></div>`;
+  opt("×1",1,it.value);
+  if(cnt>=5) opt("×5",5,it.value*5);
+  if(cnt>=10)opt("×10",10,it.value*10);
+  if(cnt>1)  opt(`${t("sellall")} (×${cnt})`,-1,it.value*cnt,"sopt-all");
   document.getElementById("sell-opts").innerHTML=html;
-  document.getElementById("sell-modal").classList.add("visible");
+  document.getElementById("t-cancel").textContent=t("cancel");
+  document.getElementById("sell-modal").classList.add("on");
 }
 function closeSellModal(e){
-  if(e&&e.target!==document.getElementById("sell-modal")) return;
-  document.getElementById("sell-modal").classList.remove("visible");
+  if(e&&e.target!==document.getElementById("sell-modal"))return;
+  document.getElementById("sell-modal").classList.remove("on");
   modalItem=null;
 }
 async function execSell(qty){
-  if(!modalItem) return;
+  if(!modalItem)return;
   try{
-    const d=await apiFetch("/api/sell",{method:"POST",body:JSON.stringify({item_key:modalItem,quantity:qty})});
-    state.gold=d.gold;
-    state.inventory[modalItem]=(state.inventory[modalItem]||0)-d.sold;
-    if(state.inventory[modalItem]<=0) delete state.inventory[modalItem];
-    updateGold(); renderInventory();
+    const d=await api("/api/sell",{method:"POST",body:JSON.stringify({item_key:modalItem,quantity:qty})});
+    S.gold=d.gold;
+    S.inventory[modalItem]=(S.inventory[modalItem]||0)-d.sold;
+    if(S.inventory[modalItem]<=0)delete S.inventory[modalItem];
+    updateGold();renderInv();
     showToast(`${t("sold_for")} ${d.earnings}🪙!`);
   }catch(e){}
-  document.getElementById("sell-modal").classList.remove("visible");
+  document.getElementById("sell-modal").classList.remove("on");
   modalItem=null;
 }
 async function sellAll(){
-  const items=Object.entries(state.inventory).filter(([,v])=>v>0);
+  const items=Object.entries(S.inventory).filter(([,v])=>v>0);
   if(!items.length){showToast(t("inv_empty"));return;}
   try{
-    const d=await apiFetch("/api/sell_all",{method:"POST"});
-    state.gold=d.gold; state.inventory={};
-    updateGold(); renderInventory();
-    showToast(`${t("sold_all_for")} ${d.earnings}🪙!`);
+    const d=await api("/api/sell_all",{method:"POST"});
+    S.gold=d.gold;S.inventory={};
+    updateGold();renderInv();
+    showToast(`${t("sold_all")} ${d.earnings}🪙!`);
   }catch(e){}
 }
 
@@ -1216,28 +1114,34 @@ function shareRef(){
   const uid=tg?.initDataUnsafe?.user?.id||"demo";
   const link=`https://t.me/${BOT_USERNAME}?start=ref_${uid}`;
   const txt=LANG==="ru"
-    ? "⚔️ Присоединяйся ко мне в Treasure Chest — фэнтезийная лут-игра!"
-    : "⚔️ Join me in Treasure Chest — a fantasy loot game!";
-  if(tg?.openTelegramLink) tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(txt)}`);
-  else if(navigator.share) navigator.share({url:link,text:txt});
-  else { navigator.clipboard?.writeText(link); showToast(t("link_copied")); }
+    ?"⚔️ Присоединяйся к Treasure Chest — фэнтезийная лут-игра!"
+    :"⚔️ Join me in Treasure Chest — a fantasy loot game!";
+  if(tg?.openTelegramLink)tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(txt)}`);
+  else if(navigator.share)navigator.share({url:link,text:txt});
+  else{navigator.clipboard?.writeText(link);showToast(t("link_copied"));}
 }
 
 let toastTmr;
 function showToast(msg){
   const el=document.getElementById("toast");
-  el.textContent=msg; el.classList.add("show");
+  el.textContent=msg;el.classList.add("show");
   clearTimeout(toastTmr);
   toastTmr=setTimeout(()=>el.classList.remove("show"),2400);
 }
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 //  INIT
-// ═══════════════════════════════════════════
+// ═══════════════════════════
 (async()=>{
   applyLang();
   renderChests();
-  try{ await loadPlayer(); renderChests(); } catch(e){ console.warn(e); }
+  try{
+    await loadPlayer();
+    renderChests();
+  }catch(e){
+    console.warn("Не удалось загрузить данные:",e.message);
+    showToast("❌ Ошибка загрузки данных");
+  }
 })();
 </script>
 </body>
